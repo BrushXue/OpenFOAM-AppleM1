@@ -12,17 +12,17 @@ index e84551e2..e807609c 100644
  # [WM_PRECISION_OPTION] - Floating-point precision:
  # = DP | SP | SPDP
 diff --git a/etc/config.sh/settings b/etc/config.sh/settings
-index f3a0d111..77415376 100644
+index f3a0d111..75c80639 100644
 --- a/etc/config.sh/settings
 +++ b/etc/config.sh/settings
-@@ -78,10 +78,20 @@ Linux)
+@@ -78,10 +78,22 @@ Linux)
      esac
      ;;
  
 -# Presume x86_64, with clang (not gcc) as system compiler
  Darwin)
-     WM_ARCH=darwin64
-     [ "$WM_COMPILER" = Gcc ] && WM_COMPILER=Clang
+-    WM_ARCH=darwin64
+-    [ "$WM_COMPILER" = Gcc ] && WM_COMPILER=Clang
 +    case "$(uname -m)" in
 +    x86_64)
 +        # Presume x86_64, with clang (not gcc) as system compiler
@@ -32,6 +32,10 @@ index f3a0d111..77415376 100644
 +    arm64)
 +        # Presume Apple silicon, with clang (not gcc) as system compiler
 +        WM_ARCH=darwinARM64
++        ;;
++
++    *)
++        echo "openfoam: ($(uname -m)) - unknown processor type" 1>&2
 +        ;;
 +    esac
      echo "openfoam: darwin support is clang/llvm only" 1>&2
