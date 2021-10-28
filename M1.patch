@@ -1,0 +1,222 @@
+diff --git a/etc/bashrc b/etc/bashrc
+index e84551e2..e807609c 100644
+--- a/etc/bashrc
++++ b/etc/bashrc
+@@ -68,7 +68,7 @@ export WM_COMPILER_TYPE=system
+ # [WM_COMPILER] - Compiler:
+ # = Gcc | Clang | Icc | Icx | Cray | Amd | Arm | Pgi | Fujitsu |
+ #   Gcc<digits> | Clang<digits>
+-export WM_COMPILER=Gcc
++export WM_COMPILER=Clang
+ 
+ # [WM_PRECISION_OPTION] - Floating-point precision:
+ # = DP | SP | SPDP
+diff --git a/etc/config.sh/settings b/etc/config.sh/settings
+index f3a0d111..77415376 100644
+--- a/etc/config.sh/settings
++++ b/etc/config.sh/settings
+@@ -78,10 +78,20 @@ Linux)
+     esac
+     ;;
+ 
+-# Presume x86_64, with clang (not gcc) as system compiler
+ Darwin)
+     WM_ARCH=darwin64
+     [ "$WM_COMPILER" = Gcc ] && WM_COMPILER=Clang
++    case "$(uname -m)" in
++    x86_64)
++        # Presume x86_64, with clang (not gcc) as system compiler
++        WM_ARCH=darwin64
++        ;;
++
++    arm64)
++        # Presume Apple silicon, with clang (not gcc) as system compiler
++        WM_ARCH=darwinARM64
++        ;;
++    esac
+     echo "openfoam: darwin support is clang/llvm only" 1>&2
+     ;;
+ 
+diff --git a/src/OSspecific/POSIX/signals/sigFpe.C b/src/OSspecific/POSIX/signals/sigFpe.C
+index 29a95852..bc284b9b 100644
+--- a/src/OSspecific/POSIX/signals/sigFpe.C
++++ b/src/OSspecific/POSIX/signals/sigFpe.C
+@@ -44,7 +44,7 @@ License
+     #include <malloc.h>
+ #endif
+ 
+-#ifdef __APPLE__
++#if defined(__APPLE__) && defined(__x86_64__)
+     #include "feexceptErsatz.H"
+ #endif
+ 
+@@ -117,7 +117,7 @@ void* Foam::sigFpe::mallocNan(size_t size)
+ 
+ void Foam::sigFpe::sigHandler(int)
+ {
+-    #if (defined(__linux__) && defined(__GNUC__)) || defined(__APPLE__)
++    #if (defined(__linux__) && defined(__GNUC__)) || (defined(__APPLE__) && defined(__x86_64__))
+ 
+     resetHandler("SIGFPE", SIGFPE);
+ 
+@@ -184,7 +184,7 @@ void Foam::sigFpe::set(bool verbose)
+ {
+     if (!sigActive_ && requested())
+     {
+-        #if (defined(__linux__) && defined(__GNUC__)) || defined(__APPLE__)
++        #if (defined(__linux__) && defined(__GNUC__)) || (defined(__APPLE__) && defined(__x86_64__))
+ 
+         feenableexcept
+         (
+@@ -240,7 +240,7 @@ void Foam::sigFpe::set(bool verbose)
+ 
+ void Foam::sigFpe::unset(bool verbose)
+ {
+-    #if (defined(__linux__) && defined(__GNUC__)) || defined(__APPLE__)
++    #if (defined(__linux__) && defined(__GNUC__)) || (defined(__APPLE__) && defined(__x86_64__))
+     if (sigActive_)
+     {
+         if (verbose)
+diff --git a/wmake/rules/darwinARM64Clang/c b/wmake/rules/darwinARM64Clang/c
+new file mode 100644
+index 00000000..080c1b9f
+--- /dev/null
++++ b/wmake/rules/darwinARM64Clang/c
+@@ -0,0 +1,18 @@
++include $(GENERAL_RULES)/Clang/c
++
++c           = clang
++
++cARCH       = 
++
++# Compile option is non-mandatory, but must be non-empty
++sinclude $(DEFAULT_RULES)/c$(WM_COMPILE_OPTION)
++
++cFLAGS      = $(cARCH) $(GFLAGS) $(cWARN) $(cOPT) $(cDBUG) $(LIB_HEADER_DIRS) -fPIC
++
++ctoo        = $(WM_SCHEDULER) $(cc) $(cFLAGS) -c $< -o $@
++
++LINK_LIBS   = $(cDBUG)
++
++LINKLIBSO   = $(cc) $(cARCH) -Wl,-dylib,-undefined,dynamic_lookup
++
++LINKEXE     = $(cc) $(cARCH) -Wl,-execute,-undefined,dynamic_lookup
+diff --git a/wmake/rules/darwinARM64Clang/c++ b/wmake/rules/darwinARM64Clang/c++
+new file mode 100644
+index 00000000..56a825bd
+--- /dev/null
++++ b/wmake/rules/darwinARM64Clang/c++
+@@ -0,0 +1,20 @@
++include $(GENERAL_RULES)/Clang/c++
++
++CC          = clang++ -std=c++14
++
++c++ARCH     = -pthread
++
++include $(DEFAULT_RULES)/c++$(WM_COMPILE_OPTION)
++
++c++FLAGS    = $(c++ARCH) $(GFLAGS) $(c++WARN) $(c++OPT) $(c++DBUG) $(ptFLAGS) $(LIB_HEADER_DIRS) -fPIC
++
++Ctoo        = $(WM_SCHEDULER) $(CC) $(c++FLAGS) -c $< -o $@
++cxxtoo      = $(Ctoo)
++cctoo       = $(Ctoo)
++cpptoo      = $(Ctoo)
++
++LINK_LIBS   = $(c++DBUG)
++
++LINKLIBSO   = $(CC) $(c++FLAGS) -Wl,-dylib,-undefined,dynamic_lookup
++
++LINKEXE     = $(CC) $(c++FLAGS) -Wl,-execute,-undefined,dynamic_lookup
+diff --git a/wmake/rules/darwinARM64Clang/c++Debug b/wmake/rules/darwinARM64Clang/c++Debug
+new file mode 100644
+index 00000000..48f0b664
+--- /dev/null
++++ b/wmake/rules/darwinARM64Clang/c++Debug
+@@ -0,0 +1,2 @@
++c++DBUG     = -g -DFULLDEBUG
++c++OPT      = -O0
+diff --git a/wmake/rules/darwinARM64Clang/c++Opt b/wmake/rules/darwinARM64Clang/c++Opt
+new file mode 100644
+index 00000000..2aedabd6
+--- /dev/null
++++ b/wmake/rules/darwinARM64Clang/c++Opt
+@@ -0,0 +1,2 @@
++c++DBUG     =
++c++OPT      = -O3
+diff --git a/wmake/rules/darwinARM64Clang/c++Prof b/wmake/rules/darwinARM64Clang/c++Prof
+new file mode 100644
+index 00000000..3bda4dad
+--- /dev/null
++++ b/wmake/rules/darwinARM64Clang/c++Prof
+@@ -0,0 +1,2 @@
++c++DBUG    = -pg
++c++OPT     = -O2
+diff --git a/wmake/rules/darwinARM64Clang/cDebug b/wmake/rules/darwinARM64Clang/cDebug
+new file mode 100644
+index 00000000..7b7adf10
+--- /dev/null
++++ b/wmake/rules/darwinARM64Clang/cDebug
+@@ -0,0 +1,2 @@
++cDBUG       = -g -DFULLDEBUG
++cOPT        = -O0
+diff --git a/wmake/rules/darwinARM64Clang/cOpt b/wmake/rules/darwinARM64Clang/cOpt
+new file mode 100644
+index 00000000..17318709
+--- /dev/null
++++ b/wmake/rules/darwinARM64Clang/cOpt
+@@ -0,0 +1,2 @@
++cDBUG       =
++cOPT        = -O3
+diff --git a/wmake/rules/darwinARM64Clang/cProf b/wmake/rules/darwinARM64Clang/cProf
+new file mode 100644
+index 00000000..ca3ac9bf
+--- /dev/null
++++ b/wmake/rules/darwinARM64Clang/cProf
+@@ -0,0 +1,2 @@
++cDBUG       = -pg
++cOPT        = -O2
+diff --git a/wmake/rules/darwinARM64Clang/cgal b/wmake/rules/darwinARM64Clang/cgal
+new file mode 100644
+index 00000000..c8ae8255
+--- /dev/null
++++ b/wmake/rules/darwinARM64Clang/cgal
+@@ -0,0 +1,11 @@
++# ----------------------------------------------------------------------------
++# CGAL on Darwin
++# CGAL (library version) without mpfr
++
++CGAL_INC  = \
++    $(foreach dir,$(BOOST_INC_DIR),-I$(dir)) \
++    $(foreach dir,$(CGAL_INC_DIR),-I$(dir))
++
++CGAL_LIBS = -lgmp -lmpfr
++
++# ----------------------------------------------------------------------------
+diff --git a/wmake/rules/darwinARM64Clang/general b/wmake/rules/darwinARM64Clang/general
+new file mode 100644
+index 00000000..c3053126
+--- /dev/null
++++ b/wmake/rules/darwinARM64Clang/general
+@@ -0,0 +1,22 @@
++CPP        = cpp -traditional-cpp $(GFLAGS)
++
++include $(GENERAL_RULES)/standard
++## include $(GENERAL_RULES)/Clang/openmp
++
++# Darwin-specific
++# ----
++COMP_OPENMP = -DUSE_OMP -Xpreprocessor -fopenmp
++LINK_OPENMP = -lomp
++# ----
++
++ifneq (,$(findstring ~openmp,$(WM_COMPILE_CONTROL)))
++    include $(GENERAL_RULES)/no-openmp
++endif
++
++include $(DEFAULT_RULES)/c
++include $(DEFAULT_RULES)/c++
++
++# Shared library extension (with '.' separator)
++EXT_SO  = .dylib
++
++# -----------------------------------------------------------------------------
