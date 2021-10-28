@@ -9,6 +9,4 @@ Patch to compile OpenFOAM-v2106 on M1 Mac.
 4. Compile, takes approximately 35 minutes on M1.
 
 ## Known issues
-1. Missing header in homebrew [kahip](https://github.com/Homebrew/homebrew-core/blob/HEAD/Formula/kahip.rb).
-2. Missing header in homwbrew [ptscotch](https://github.com/Homebrew/homebrew-core/blob/HEAD/Formula/scotch.rb).
-3. sigFpe is disabled for now until new solution comes.
+sigFpe is disabled for now until new solution comes.
