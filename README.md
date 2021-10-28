@@ -6,6 +6,7 @@ Patch to compile OpenFOAM-v2106 on M1 Mac.
 1. Download and extract [OpenFOAM v2016 source code](https://dl.openfoam.com/source/v2106/OpenFOAM-v2106.tgz).
 2. Apply macOS [patch](https://github.com/mrklein/openfoam-os-x/blob/master/OpenFOAM-v2106.patch) from mrklein.
 3. Apply my patch for M1
+4. Compile, takes approximately 35 minutes on M1.
 
 ## Known issues
 1. Missing header in homebrew [kahip](https://github.com/Homebrew/homebrew-core/blob/HEAD/Formula/kahip.rb).
