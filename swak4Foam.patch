@@ -1,0 +1,35 @@
+diff --git a/Allwmake b/Allwmake
+index 904d6a3..5938738 100755
+--- a/Allwmake
++++ b/Allwmake
+@@ -86,7 +86,7 @@ fi
+ BEARPATH=$(which bear)
+ if [[ $? == 0 ]]; then
+     echo "Using ${BEARPATH} to build compilation database"
+-    export BEAR_COMPILE_PREFIX="bear --append --cdb=$(pwd)/compile_commands.json"
++    export BEAR_COMPILE_PREFIX="bear --append --output $(pwd)/compile_commands.json --"
+ else
+     echo "No 'bear' installed"
+ fi
+diff --git a/Libraries/simpleFunctionObjects/functionObjectProxy/executeIfExecutableFitsFunctionObject/executeIfExecutableFitsFunctionObject.C b/Libraries/simpleFunctionObjects/functionObjectProxy/executeIfExecutableFitsFunctionObject/executeIfExecutableFitsFunctionObject.C
+index d5a42e1..f460960 100644
+--- a/Libraries/simpleFunctionObjects/functionObjectProxy/executeIfExecutableFitsFunctionObject/executeIfExecutableFitsFunctionObject.C
++++ b/Libraries/simpleFunctionObjects/functionObjectProxy/executeIfExecutableFitsFunctionObject/executeIfExecutableFitsFunctionObject.C
+@@ -37,7 +37,7 @@ Contributors/Copyright:
+ #include "swakTime.H"
+ 
+ 
+-#ifdef darwin
++#ifdef __APPLE__
+ #include "mach-o/dyld.h"
+ #endif
+ #ifdef __linux__
+@@ -76,7 +76,7 @@ executeIfExecutableFitsFunctionObject::executeIfExecutableFitsFunctionObject
+ 
+     fileName exePath;
+ 
+-#ifdef darwin
++#ifdef __APPLE__
+     {
+         char path[1024];
+         uint32_t size = sizeof(path);
