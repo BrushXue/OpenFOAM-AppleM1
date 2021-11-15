@@ -11,7 +11,7 @@ class Scotch < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
-  depends_on "open-mpi" => :build
+  depends_on "open-mpi"
 
   uses_from_macos "bison"
   uses_from_macos "flex"
