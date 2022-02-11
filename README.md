@@ -6,7 +6,7 @@ Patch to compile OpenFOAM-v2112 on M1 Mac.
 ### Procedures
 1. Download and extract [OpenFOAM v2112 source code](https://dl.openfoam.com/source/v2112/OpenFOAM-v2112.tgz).
 2. Apply my patch for M1.
-3. Remove scotch from Homebrew(if exists) and install mine formula.
+3. Remove scotch from Homebrew if exists and install my formula(`--build-from-source`).
 
 And you probably need to add the following
 ```
