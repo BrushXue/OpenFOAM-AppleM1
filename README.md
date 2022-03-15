@@ -6,7 +6,7 @@ Patch to compile OpenFOAM-v2112 on M1 Mac.
 ### Procedures
 1. Download and extract [OpenFOAM v2112 source code](https://dl.openfoam.com/source/v2112/OpenFOAM-v2112.tgz).
 2. Apply my patch for M1.
-3. Install `scotch` without `-DSCOTCH_PTHREAD` and CGAL4 (Thanks to @gerlero for creating this [tap](https://github.com/gerlero/homebrew-openfoam/tree/main/Formula)
+3. Install `scotch` without `-DSCOTCH_PTHREAD` and CGAL4 (Thanks to @gerlero for creating this [tap](https://github.com/gerlero/homebrew-openfoam/tree/main/Formula))
 ```
 brew tap gerlero/openfoam
 brew install scotch-no-pthread cgal@4
@@ -36,4 +36,4 @@ AllwmakeAll
 It takes approximately 6 minutes on M1.
 
 ### Known issue
-Since macOS 12.3, python 2.7 is removed. Therefore `swakPythonIntegration` and `funkyPythonPostproc` are disabled.
+python 2.7 is removed in macOS 12.3+. Therefore `swakPythonIntegration` and `funkyPythonPostproc` are disabled.
