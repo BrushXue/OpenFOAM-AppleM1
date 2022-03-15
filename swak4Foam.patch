@@ -1,7 +1,30 @@
+diff --git a/Allwclean b/Allwclean
+index 74f7bb3..2e4a64f 100755
+--- a/Allwclean
++++ b/Allwclean
+@@ -13,7 +13,7 @@ fi
+ 
+ find . -name "*.dep" -print -exec rm {} \;
+ 
+-find . -name compile_commands.json -print0 | xargs --null rm -f
+-find . -name .clangd -print0 | xargs --null rm -rf
++find . -name compile_commands.json -print0 | xargs -0 rm -f
++find . -name .clangd -print0 | xargs -0 rm -rf
+ 
+ rm -f foamVersionThisIsCompiledFor
 diff --git a/Allwmake b/Allwmake
-index 904d6a3..5938738 100755
+index 904d6a3..e56c417 100755
 --- a/Allwmake
 +++ b/Allwmake
+@@ -7,7 +7,7 @@ if [ -z "$WM_PROJECT_VERSION" ]; then
+     exit 42
+ fi
+ 
+-PY_BINARY_PATH=$(which python)
++PY_BINARY_PATH=$(which python3)
+ if [[ $? != 0 ]]; then
+     echo "Some scripts require a binary 'python' to be installed"
+     echo "It doesn't matter if this is Python 2 or 3"
 @@ -86,7 +86,7 @@ fi
  BEARPATH=$(which bear)
  if [[ $? == 0 ]]; then
@@ -11,6 +34,67 @@ index 904d6a3..5938738 100755
  else
      echo "No 'bear' installed"
  fi
+diff --git a/AllwmakeAll b/AllwmakeAll
+index 8f599f3..5aa4356 100755
+--- a/AllwmakeAll
++++ b/AllwmakeAll
+@@ -1,6 +1,6 @@
+ #! /bin/bash
+ 
+-./maintainanceScripts/compileRequirements.sh
++#./maintainanceScripts/compileRequirements.sh
+ 
+ if [ ! -e ./swakConfiguration ] ; then
+     echo "Using automatic swakConfiguration because none is there"
+diff --git a/Libraries/languageIntegration/Allwmake b/Libraries/languageIntegration/Allwmake
+index f5363a2..2623e0f 100755
+--- a/Libraries/languageIntegration/Allwmake
++++ b/Libraries/languageIntegration/Allwmake
+@@ -11,26 +11,26 @@ fi
+ 
+ wmake libso swakGeneralLanguageIntegration
+ 
+-if [ "$SWAK_PYTHON2_INCLUDE" != "" ]
+-then
+-    SOEXT=so
++# if [ "$SWAK_PYTHON2_INCLUDE" != "" ]
++# then
++#     SOEXT=so
+ 
+-    if [ `uname -s`=="Darwin" ]; then
+-	SOEXT=dylib
+-    fi
++#     if [ `uname -s`=="Darwin" ]; then
++# 	SOEXT=dylib
++#     fi
+ 
+-    oldPython="$FOAM_USER_LIBBIN/libpythonIntegration.$SOEXT"
+-    if [ -e $oldPython ]
+-    then
+-	echo "Removing old python integration $oldPython"
+-	rm $oldPython
+-    fi
+-    wmake libso swakPythonIntegration
+-else
+-    echo
+-    echo "SWAK_PYTHON2_INCLUDE not defined .... no Python2-Integration. Most people are fine without it"
+-    echo
+-fi
++#     oldPython="$FOAM_USER_LIBBIN/libpythonIntegration.$SOEXT"
++#     if [ -e $oldPython ]
++#     then
++# 	echo "Removing old python integration $oldPython"
++# 	rm $oldPython
++#     fi
++#     wmake libso swakPythonIntegration
++# else
++#     echo
++#     echo "SWAK_PYTHON2_INCLUDE not defined .... no Python2-Integration. Most people are fine without it"
++#     echo
++# fi
+ 
+ if [ "$SWAK_PYTHON3_INCLUDE" != "" ]
+ then
 diff --git a/Libraries/simpleFunctionObjects/functionObjectProxy/executeIfExecutableFitsFunctionObject/executeIfExecutableFitsFunctionObject.C b/Libraries/simpleFunctionObjects/functionObjectProxy/executeIfExecutableFitsFunctionObject/executeIfExecutableFitsFunctionObject.C
 index d5a42e1..f460960 100644
 --- a/Libraries/simpleFunctionObjects/functionObjectProxy/executeIfExecutableFitsFunctionObject/executeIfExecutableFitsFunctionObject.C
@@ -33,3 +117,112 @@ index d5a42e1..f460960 100644
      {
          char path[1024];
          uint32_t size = sizeof(path);
+diff --git a/Utilities/Allwmake b/Utilities/Allwmake
+index c00d270..c2f9506 100755
+--- a/Utilities/Allwmake
++++ b/Utilities/Allwmake
+@@ -17,7 +17,7 @@ wmake calcNonUniformOffsetsForMapped
+ 
+ wmake fieldReport
+ 
+-wmake funkyPythonPostproc
++# wmake funkyPythonPostproc
+ 
+ wmake funkySetLagrangianField
+ 
+diff --git a/maintainanceScripts/makeCopyrightEntries.py b/maintainanceScripts/makeCopyrightEntries.py
+index 47d5500..c2331e6 100755
+--- a/maintainanceScripts/makeCopyrightEntries.py
++++ b/maintainanceScripts/makeCopyrightEntries.py
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env python
++#! /usr/bin/env python3
+ 
+ import sys,re
+ from os import listdir,path
+diff --git a/maintainanceScripts/makeFoamVersionHeader.py b/maintainanceScripts/makeFoamVersionHeader.py
+index 5e5fa05..6df93ab 100755
+--- a/maintainanceScripts/makeFoamVersionHeader.py
++++ b/maintainanceScripts/makeFoamVersionHeader.py
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env python
++#! /usr/bin/env python3
+ 
+ # This is a bit warped because
+ # a. It has to support inconsistent version numbers
+diff --git a/maintainanceScripts/makeSwakVersionFile.py b/maintainanceScripts/makeSwakVersionFile.py
+index 12f507b..4b35708 100755
+--- a/maintainanceScripts/makeSwakVersionFile.py
++++ b/maintainanceScripts/makeSwakVersionFile.py
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env python
++#! /usr/bin/env python3
+ 
+ import sys
+ from os import path
+diff --git a/swakConfiguration.automatic b/swakConfiguration.automatic
+index a3cecee..d2caaa2 100644
+--- a/swakConfiguration.automatic
++++ b/swakConfiguration.automatic
+@@ -1,26 +1,26 @@
+ # -*- shell-script -*-
+ 
+-if [[ -z "$SWAK_PYTHON2VERSION" ]] ; then
+-    echo "Looking for Python 2"
+-    for p2 in 7 6
+-    do
+-        WHICHPATH=$(which 2>/dev/null python2.$p2-config)
+-        if [[ $? == 0 ]]; then
+-            echo "Found Python 2.$p2"
+-            SWAK_PYTHON2VERSION=$p2
+-            break
+-        fi
+-    done
+-else
+-    echo "Python 2 preset to 2.$SWAK_PYTHON2VERSION"
+-fi
++# if [[ -z "$SWAK_PYTHON2VERSION" ]] ; then
++#     echo "Looking for Python 2"
++#     for p2 in 7 6
++#     do
++#         WHICHPATH=$(which 2>/dev/null python2.$p2-config)
++#         if [[ $? == 0 ]]; then
++#             echo "Found Python 2.$p2"
++#             SWAK_PYTHON2VERSION=$p2
++#             break
++#         fi
++#     done
++# else
++#     echo "Python 2 preset to 2.$SWAK_PYTHON2VERSION"
++# fi
+ 
+-if [[ -n "$SWAK_PYTHON2VERSION" ]] ; then
+-    echo "Configuring Python 2.$SWAK_PYTHON2VERSION"
+-    export SWAK_PYTHON2_INCLUDE="$(python2.$SWAK_PYTHON2VERSION-config --cflags)"
+-    export SWAK_PYTHON2_LINK="$(python2.$SWAK_PYTHON2VERSION-config --ldflags)"
+-    echo "Using python2.$SWAK_PYTHON2VERSION at $WHICHPATH for python2"
+-fi
++# if [[ -n "$SWAK_PYTHON2VERSION" ]] ; then
++#     echo "Configuring Python 2.$SWAK_PYTHON2VERSION"
++#     export SWAK_PYTHON2_INCLUDE="$(python2.$SWAK_PYTHON2VERSION-config --cflags)"
++#     export SWAK_PYTHON2_LINK="$(python2.$SWAK_PYTHON2VERSION-config --ldflags)"
++#     echo "Using python2.$SWAK_PYTHON2VERSION at $WHICHPATH for python2"
++# fi
+ 
+ if [[ -z "$SWAK_PYTHON3VERSION" ]] ; then
+     echo "Looking for Python 3"
+@@ -76,10 +76,10 @@ fi
+ 
+ export SWAK_COMPILE_GRAMMAR_OPTION="-O1"
+ 
+-if [ "$WM_USE_HOMEBREW" = 1 ]
+-then
+-    export SWAK_BISON=/usr/local/opt/bison27/bin/bison
+-fi
++# if [ "$WM_USE_HOMEBREW" = 1 ]
++# then
++    export SWAK_BISON=/opt/homebrew/opt/bison/bin/bison
++# fi
+ 
+ # If enabled, uses a 30 delay for building Bison generated files.
+ # Useful only for checking if there are any race conditions.
