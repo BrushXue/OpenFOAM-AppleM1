@@ -6,13 +6,13 @@ Patch to compile OpenFOAM-v2112 on M1 Mac.
 ### Procedures
 1. Download and extract [OpenFOAM v2112 source code](https://dl.openfoam.com/source/v2112/OpenFOAM-v2112.tgz).
 2. Apply my patch for M1.
-3. Install `scotch` without `-DSCOTCH_PTHREAD` (Thanks to @gerlero for creating this tap)
+3. Install `scotch` without `-DSCOTCH_PTHREAD` and CGAL4 (Thanks to @gerlero for creating this [tap](https://github.com/gerlero/homebrew-openfoam/tree/main/Formula)
 ```
 brew tap gerlero/openfoam
-brew install scotch-no-pthread
+brew install scotch-no-pthread cgal@4
 ```
 
-And you probably need to add the following
+And you probably need to add the following:
 ```
 export CPATH=/opt/homebrew/include
 export LIBRARY_PATH=/opt/homebrew/lib
@@ -29,10 +29,11 @@ sigFpe is disabled for now until new solution comes.
 ```
 export PATH="/opt/homebrew/opt/bison/bin:$PATH"
 ```
-3. Compile the code. It takes approximately 6 minutes on M1.
+3. Compile the code.
+```
+AllwmakeAll
+```
+It takes approximately 6 minutes on M1.
 
 ### Known issue
-System integrated python 2.7 cannot be linked.
-```
-ld: cannot link directly with dylib/framework, your binary is not an allowed client of /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/config/libpython2.7.tbd for architecture arm64
-```
+Since macOS 12.3, python 2.7 is removed. Therefore `swakPythonIntegration` and `funkyPythonPostproc` are disabled.
