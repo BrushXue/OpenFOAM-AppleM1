@@ -25,6 +25,10 @@ export LIBRARY_PATH=/opt/homebrew/lib
 ./Allwmake -j -s -l -with-bear
 ```
 It takes approximately 35 minutes on M1.
+5. Install paraview
+```
+brew install --cask paraview
+```
 
 ### Known issue
 sigFpe is disabled for now until new solution comes.
@@ -47,7 +51,7 @@ export PATH="/opt/homebrew/opt/bison/bin:$PATH"
 ```
 4. Compile the code.
 ```
-AllwmakeAll
+./AllwmakeAll
 ```
 It takes approximately 6 minutes on M1.
 
