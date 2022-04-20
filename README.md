@@ -4,7 +4,7 @@ Patch to compile OpenFOAM-v2112 on M1 Mac.
 
 ## OpenFOAM-v2112
 ### Procedures
-1. Download and extract [OpenFOAM v2112 source code](https://dl.openfoam.com/source/v2112/OpenFOAM-v2112.tgz).
+1. Download and extract [OpenFOAM v2112 source code](https://dl.openfoam.com/source/v2112/OpenFOAM-v2112.tgz) in a case-sensitive volume.
 2. Apply my patch for M1.
 ```
 git apply M1.patch
@@ -14,7 +14,6 @@ git apply M1.patch
 brew tap gerlero/openfoam
 brew install scotch-no-pthread cgal@4
 ```
-
 And you probably need to add the following:
 ```
 export CPATH=/opt/homebrew/include
