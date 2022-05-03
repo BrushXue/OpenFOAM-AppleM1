@@ -9,7 +9,11 @@ Patch to compile OpenFOAM-v2112 on M1 Mac.
 ```
 git apply M1.patch
 ```
-3. Install `scotch` without `-DSCOTCH_PTHREAD` and `CGAL@4` (Thanks to @gerlero for creating this [tap](https://github.com/gerlero/homebrew-openfoam/tree/main/Formula))
+3. Install these components from homebrew
+```
+brew install cmake open-mpi libomp adios2 boost fftw kahip metis 
+```
+4. Install modifiled `scotch` and `CGAL@4` (Thanks to @gerlero for creating this [tap](https://github.com/gerlero/homebrew-openfoam/tree/main/Formula))
 ```
 brew tap gerlero/openfoam
 brew install scotch-no-pthread cgal@4
@@ -19,13 +23,13 @@ And you probably need to add the following:
 export CPATH=/opt/homebrew/include
 export LIBRARY_PATH=/opt/homebrew/lib
 ```
-4. Compile the code with [bear](https://openfoamwiki.net/index.php/HowTo_Use_OpenFOAM_with_Visual_Studio_Code) (remove `-with-bear` if you don't need it).
+5. Compile the code with [bear](https://openfoamwiki.net/index.php/HowTo_Use_OpenFOAM_with_Visual_Studio_Code) (remove `-with-bear` if you don't need it).
 ```
 ./Allwmake -j -s -l -with-bear
 ```
 It takes approximately 35 minutes on M1.
 
-5. Install `paraview` from Homebrew
+6. Install `paraview` from Homebrew
 ```
 brew install --cask paraview
 ```
