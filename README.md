@@ -1,6 +1,6 @@
 # OpenFOAM-AppleM1
 
-Patch to compile OpenFOAM-v2112 on M1 Mac.
+Patch to compile OpenFOAM-v2206 on M1 Mac.
 
 ## OpenFOAM-v2112
 ### Procedures
