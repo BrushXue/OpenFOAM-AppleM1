@@ -51,7 +51,7 @@ git apply swak4Foam.patch
 ```
 4. Add bison to the path:
 ```
-export PATH="/opt/homebrew/opt/bison/bin:$PATH"
+export PATH="$(brew --prefix)/opt/bison/bin:$PATH"
 ```
 4. Compile the code.
 ```
