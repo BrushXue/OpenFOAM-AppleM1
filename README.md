@@ -49,9 +49,9 @@ hg update develop
 ```
 git apply swak4Foam.patch
 ```
-3. Install these components from homebrew
+3. Install these components from homebrew:
 ```
-brew install bision pkgconfig
+brew install bison pkgconfig
 ```
 4. Add bison to the path:
 ```
