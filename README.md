@@ -27,7 +27,7 @@ export LIBRARY_PATH=/opt/homebrew/lib
 ```
 ./Allwmake -j -s -l -with-bear
 ```
-It takes approximately 35 minutes on M1.
+It takes 40~45 minutes on M1.
 
 6. Install `paraview` from Homebrew
 ```
