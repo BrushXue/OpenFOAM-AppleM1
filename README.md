@@ -27,6 +27,7 @@ and you should add
 source $WM_PROJECT_DIR/etc/bashrc
 ```
 to the beginning of your bash/zsh scripts.
+
 6. And you probably need to add the following for M1:
 ```
 export CPATH=/opt/homebrew/include
