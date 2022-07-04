@@ -4,32 +4,36 @@ Patch to compile OpenFOAM-v2206 on M1 Mac.
 
 ## OpenFOAM-v2112
 ### Procedures
-1. Download and extract [OpenFOAM v2206 source code](https://dl.openfoam.com/source/v2206/OpenFOAM-v2206.tgz) in a **case-sensitive volume**.
-2. Apply my patch for M1. x86 should be compatible as well.
-```
-git apply M1.patch
-```
-3. Install these components from homebrew
+1. Install these components from homebrew
 ```
 brew install cmake open-mpi libomp adios2 boost fftw kahip metis 
 ```
-4. Install modifiled `scotch` and `CGAL@4` (Thanks to @gerlero for creating this [tap](https://github.com/gerlero/homebrew-openfoam/tree/main/Formula))
+2. Install modifiled `scotch` and `CGAL@4` (Thanks to @gerlero for creating this [tap](https://github.com/gerlero/homebrew-openfoam/tree/main/Formula))
 ```
 brew tap gerlero/openfoam
 brew install scotch-no-pthread cgal@4
 ```
-And you probably need to add the following for M1:
+3. Download [OpenFOAM v2206 source code](https://dl.openfoam.com/source/v2206/OpenFOAM-v2206.tgz) then extract it in a **case-sensitive volume**.
+4. Apply my patch for M1. x86 should be compatible as well.
+```
+git apply M1.patch
+```
+5. Fix `DYLD_LIBRARY_PATH` issue (Thanks Apple for implementing this [stupid feature](https://briandfoy.github.io/macos-s-system-integrity-protection-sanitizes-your-environment/).)
+```
+echo 'export FOAM_DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH"' >> etc/bashrc
+```
+6. And you probably need to add the following for M1:
 ```
 export CPATH=/opt/homebrew/include
 export LIBRARY_PATH=/opt/homebrew/lib
 ```
-5. Compile the code with [bear](https://openfoamwiki.net/index.php/HowTo_Use_OpenFOAM_with_Visual_Studio_Code) (remove `-with-bear` if you don't need it).
+7. Compile the code with [bear](https://openfoamwiki.net/index.php/HowTo_Use_OpenFOAM_with_Visual_Studio_Code) (remove `-with-bear` if you don't need it).
 ```
 ./Allwmake -j -s -l -with-bear
 ```
 It takes 40~45 minutes on M1.
 
-6. Install `paraview` from Homebrew
+8. Install `paraview` from Homebrew
 ```
 brew install --cask paraview
 ```
