@@ -2,7 +2,7 @@
 
 Patch to compile OpenFOAM-v2206 on M1 Mac.
 
-## OpenFOAM-v2112
+## OpenFOAM-v2206
 ### Procedures
 1. Install these components from homebrew
 ```
@@ -16,6 +16,7 @@ brew install scotch-no-pthread cgal@4
 3. Download [OpenFOAM v2206 source code](https://dl.openfoam.com/source/v2206/OpenFOAM-v2206.tgz) then extract it in a **case-sensitive volume**.
 4. Apply my patch for M1. x86 should be compatible as well.
 ```
+curl -OL https://github.com/BrushXue/OpenFOAM-AppleM1/raw/main/M1.patch
 git apply M1.patch
 ```
 5. Fix `DYLD_LIBRARY_PATH` issue (Thanks Apple for implementing this [stupid feature](https://briandfoy.github.io/macos-s-system-integrity-protection-sanitizes-your-environment/).)
@@ -57,6 +58,7 @@ hg update develop
 ```
 2. Apply my patch for macOS.
 ```
+curl -OL https://github.com/BrushXue/OpenFOAM-AppleM1/raw/main/swak4Foam.patch
 git apply swak4Foam.patch
 ```
 3. Install these components from homebrew:
@@ -75,3 +77,6 @@ It takes approximately 6 minutes on M1.
 
 ### Known issue
 python 2.7 is removed in macOS 12.3+. Therefore `swakPythonIntegration` and `funkyPythonPostproc` are disabled.
+
+## Benchmark
+The [benchmark](https://github.com/BrushXue/OpenFOAM-AppleM1/raw/main/bench_template.tgz) is modified from https://www.cfd-online.com/Forums/hardware/198378-openfoam-benchmarks-various-hardware.html
