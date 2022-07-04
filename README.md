@@ -13,7 +13,14 @@ brew install cmake open-mpi libomp adios2 boost fftw kahip metis
 brew tap gerlero/openfoam
 brew install scotch-no-pthread cgal@4
 ```
-3. Download [OpenFOAM v2206 source code](https://dl.openfoam.com/source/v2206/OpenFOAM-v2206.tgz) then extract it in a **case-sensitive volume**.
+3. Clone OpenFOAM v2206 source code to a **case-sensitive volume**.
+```
+git clone https://develop.openfoam.com/Development/openfoam.git OpenFOAM-v2206
+cd OpenFOAM-v2206
+git checkout OpenFOAM-v2206
+git submodule init
+git submodule update
+```
 4. Apply my patch for M1. x86 should be compatible as well.
 ```
 curl -OL https://github.com/BrushXue/OpenFOAM-AppleM1/raw/main/M1.patch
@@ -23,12 +30,10 @@ git apply M1.patch
 ```
 echo 'export FOAM_DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH"' >> etc/bashrc
 ```
-and you should add
+and you may need to add the following to your bash/zsh scripts.
 ```
 source $WM_PROJECT_DIR/etc/bashrc
 ```
-to the beginning of your bash/zsh scripts.
-
 6. And you probably need to add the following for M1:
 ```
 export CPATH=/opt/homebrew/include
