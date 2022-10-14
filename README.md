@@ -4,16 +4,7 @@ Patch to compile OpenFOAM-v2206 on M1 Mac.
 
 ## OpenFOAM-v2206
 ### Procedures
-1. Install these components from homebrew
-```
-brew install cmake open-mpi libomp adios2 boost fftw kahip metis 
-```
-2. Install modifiled `scotch` and `CGAL@4` (Thanks to @gerlero for creating this [tap](https://github.com/gerlero/homebrew-openfoam/tree/main/Formula))
-```
-brew tap gerlero/openfoam
-brew install scotch-no-pthread cgal@4
-```
-3. Create to a **case-sensitive volume** like this
+1. Create to a **case-sensitive volume** like this
 
 ![](https://develop.openfoam.com/Development/openfoam/-/wikis/images/apple-APFS-screenshot.png)
 
@@ -22,7 +13,19 @@ I usually create a soft link so I don't need to change `etc/bashrc`
 ln -s /Volumes/OpenFOAM ~/OpenFOAM
 cd ~/OpenFOAM
 ```
-then clone the OpenFOAM source code into this volume
+
+2. Install these components from homebrew
+```
+brew install cmake open-mpi libomp adios2 boost fftw kahip metis 
+```
+
+3. Install modifiled `scotch` and `CGAL@4` (Thanks to @gerlero for creating this [tap](https://github.com/gerlero/homebrew-openfoam/tree/main/Formula))
+```
+brew tap gerlero/openfoam
+brew install scotch-no-pthread cgal@4
+```
+
+4. Clone the OpenFOAM source code into this volume
 ```
 git clone https://develop.openfoam.com/Development/openfoam.git OpenFOAM-v2206
 cd OpenFOAM-v2206
@@ -30,33 +33,29 @@ git checkout OpenFOAM-v2206
 git submodule init
 git submodule update
 ```
-4. Apply mrklein's patch for OpenFOAM-v2206
+
+5. Apply mrklein's patch for OpenFOAM-v2206
 ```
 curl -OL https://github.com/mrklein/openfoam-os-x/raw/master/OpenFOAM-v2206.patch
 git apply OpenFOAM-v2206.patch
 ```
-4. Apply my patch for M1.
+
+6. Apply my patch for M1.
 ```
 curl -OL https://github.com/BrushXue/OpenFOAM-AppleM1/raw/main/M1.patch
 git apply M1.patch
 ```
-5. Fix `DYLD_LIBRARY_PATH` issue (Thanks Apple for implementing this [stupid feature](https://briandfoy.github.io/macos-s-system-integrity-protection-sanitizes-your-environment/).)
-```
-echo 'export FOAM_DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH"' >> etc/bashrc
-```
-and you may need to add the following to your bash/zsh script running OpenFOAM executables.
-```
-source $WM_PROJECT_DIR/etc/bashrc
-```
-6. And you probably need to add the following for M1:
-```
-export CPATH=/opt/homebrew/include
-export LIBRARY_PATH=/opt/homebrew/lib
-```
+
 7. Add OpenFOAM to `.zshrc` or `.bashrc`
 ```
 echo 'source ~/OpenFOAM/OpenFOAM-v2206/etc/bashrc' >> ~./zshrc
 ```
+And you probably need to add the following for M1:
+```
+export CPATH=/opt/homebrew/include
+export LIBRARY_PATH=/opt/homebrew/lib
+```
+
 8. Compile the code with [bear](https://openfoamwiki.net/index.php/HowTo_Use_OpenFOAM_with_Visual_Studio_Code) (remove `-with-bear` if you don't need it).
 ```
 ./Allwmake -j -s -l -with-bear
