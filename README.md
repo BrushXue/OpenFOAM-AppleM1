@@ -17,6 +17,11 @@ brew install scotch-no-pthread cgal@4
 
 ![](https://develop.openfoam.com/Development/openfoam/-/wikis/images/apple-APFS-screenshot.png)
 
+I usually create a soft link so I don't need to change `etc/bashrc`
+```
+ln -s /Volumes/OpenFOAM ~/OpenFOAM
+cd ~/OpenFOAM
+```
 then clone the OpenFOAM source code into this volume
 ```
 git clone https://develop.openfoam.com/Development/openfoam.git OpenFOAM-v2206
