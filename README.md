@@ -63,6 +63,13 @@ It takes 40~45 minutes on M1.
 brew install --cask paraview
 ```
 
+## Known Issue
+You may see these error messages on x86 Macs. It's not happening on M1. Looks like there's a bug in Apple Clang 14.
+```
+clang: error: unable to execute command: Segmentation fault: 11
+clang: error: clang frontend command failed due to signal (use -v to see invocation)
+```
+
 ### Known issue
 sigFpe is disabled for now until new solution comes.
 
