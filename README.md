@@ -39,7 +39,7 @@ git apply M1.patch
 ```
 echo 'export FOAM_DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH"' >> etc/bashrc
 ```
-and you may need to add the following to your bash/zsh scripts.
+and you may need to add the following to your bash/zsh script running OpenFOAM executables.
 ```
 source $WM_PROJECT_DIR/etc/bashrc
 ```
