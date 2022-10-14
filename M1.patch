@@ -228,9 +228,9 @@ index 0000000000..462362caef
 +
 +LINK_LIBS   = $(cDBUG)
 +
-+LINKLIBSO   = $(cc) $(cARCH) -Wl,-dylib,-undefined,dynamic_lookup
++LINKLIBSO   = $(cc) $(cARCH) -Wl,-w,-dylib,-undefined,dynamic_lookup
 +
-+LINKEXE     = $(cc) $(cARCH) -Wl,-execute,-undefined,dynamic_lookup
++LINKEXE     = $(cc) $(cARCH) -Wl,-w,-execute,-undefined,dynamic_lookup
 +
 +#------------------------------------------------------------------------------
 diff --git a/wmake/rules/darwinARM64Clang/c++ b/wmake/rules/darwinARM64Clang/c++
@@ -257,9 +257,9 @@ index 0000000000..912350a6bc
 +
 +LINK_LIBS   = $(c++DBUG)
 +
-+LINKLIBSO   = $(CC) $(c++FLAGS) -Wl,-dylib,-undefined,dynamic_lookup
++LINKLIBSO   = $(CC) $(c++FLAGS) -Wl,-w,-dylib,-undefined,dynamic_lookup
 +
-+LINKEXE     = $(CC) $(c++FLAGS) -Wl,-execute,-undefined,dynamic_lookup
++LINKEXE     = $(CC) $(c++FLAGS) -Wl,-w,-execute,-undefined,dynamic_lookup
 +
 +#------------------------------------------------------------------------------
 diff --git a/wmake/rules/darwinARM64Clang/c++Debug b/wmake/rules/darwinARM64Clang/c++Debug
