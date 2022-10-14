@@ -48,13 +48,17 @@ source $WM_PROJECT_DIR/etc/bashrc
 export CPATH=/opt/homebrew/include
 export LIBRARY_PATH=/opt/homebrew/lib
 ```
-7. Compile the code with [bear](https://openfoamwiki.net/index.php/HowTo_Use_OpenFOAM_with_Visual_Studio_Code) (remove `-with-bear` if you don't need it).
+7. Add OpenFOAM to `.zshrc` or `.bashrc`
+```
+echo 'source ~/OpenFOAM/OpenFOAM-v2206/etc/bashrc' >> ~./zshrc
+```
+8. Compile the code with [bear](https://openfoamwiki.net/index.php/HowTo_Use_OpenFOAM_with_Visual_Studio_Code) (remove `-with-bear` if you don't need it).
 ```
 ./Allwmake -j -s -l -with-bear
 ```
 It takes 40~45 minutes on M1.
 
-8. Install `paraview` from Homebrew
+9. Install `paraview` from Homebrew
 ```
 brew install --cask paraview
 ```
