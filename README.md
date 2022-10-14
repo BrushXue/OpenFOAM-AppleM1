@@ -30,7 +30,12 @@ git checkout OpenFOAM-v2206
 git submodule init
 git submodule update
 ```
-4. Apply my patch for M1. x86 should be compatible as well.
+4. Apply mrklein's patch for OpenFOAM-v2206
+```
+curl -OL https://github.com/mrklein/openfoam-os-x/raw/master/OpenFOAM-v2206.patch
+git apply OpenFOAM-v2206.patch
+```
+4. Apply my patch for M1.
 ```
 curl -OL https://github.com/BrushXue/OpenFOAM-AppleM1/raw/main/M1.patch
 git apply M1.patch
@@ -61,13 +66,6 @@ It takes 40~45 minutes on M1.
 9. Install `paraview` from Homebrew
 ```
 brew install --cask paraview
-```
-
-## Known Issue
-You may see these error messages on x86 Macs. It's not happening on M1. Looks like there's a bug in Apple Clang 14.
-```
-clang: error: unable to execute command: Segmentation fault: 11
-clang: error: clang frontend command failed due to signal (use -v to see invocation)
 ```
 
 ### Known issue
