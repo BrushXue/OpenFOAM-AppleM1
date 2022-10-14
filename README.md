@@ -13,7 +13,11 @@ brew install cmake open-mpi libomp adios2 boost fftw kahip metis
 brew tap gerlero/openfoam
 brew install scotch-no-pthread cgal@4
 ```
-3. Clone OpenFOAM v2206 source code to a **case-sensitive volume**.
+3. Create to a **case-sensitive volume** like this
+
+![](https://develop.openfoam.com/Development/openfoam/-/wikis/images/apple-APFS-screenshot.png)
+
+then clone the OpenFOAM source code into this volume
 ```
 git clone https://develop.openfoam.com/Development/openfoam.git OpenFOAM-v2206
 cd OpenFOAM-v2206
