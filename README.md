@@ -101,4 +101,4 @@ It takes approximately 6 minutes on M1.
 python 2.7 is removed in macOS 12.3+. Therefore `swakPythonIntegration` and `funkyPythonPostproc` are disabled.
 
 ## Benchmark
-The [benchmark](https://github.com/BrushXue/OpenFOAM-AppleM1/raw/main/bench_template.tgz) is modified from https://www.cfd-online.com/Forums/hardware/198378-openfoam-benchmarks-various-hardware.html
+The [benchmark](https://github.com/BrushXue/OpenFOAM-AppleM1/raw/main/bench_template.zip) is modified from https://www.cfd-online.com/Forums/hardware/198378-openfoam-benchmarks-various-hardware.html
