@@ -1,9 +1,8 @@
 diff --git a/etc/bashrc b/etc/bashrc
-index 1b24ab2b2b..67bbdd09e2 100644
+index 9d7b3effaa..99e4056d6f 100644
 --- a/etc/bashrc
 +++ b/etc/bashrc
 @@ -68,7 +68,7 @@ export WM_COMPILER_TYPE=system
- 
  # [WM_COMPILER] - Compiler:
  # = Gcc | Clang | Icc | Icx | Amd | Arm | Cray | Fujitsu | Nvidia |
  #   Gcc<digits> | Clang<digits>
@@ -13,7 +12,7 @@ index 1b24ab2b2b..67bbdd09e2 100644
  # [WM_PRECISION_OPTION] - Floating-point precision:
  # = DP | SP | SPDP
 diff --git a/etc/config.sh/CGAL b/etc/config.sh/CGAL
-index 68f679de00..7685a3635e 100644
+index 68f679de00..fdea6655f2 100644
 --- a/etc/config.sh/CGAL
 +++ b/etc/config.sh/CGAL
 @@ -43,11 +43,11 @@
@@ -33,7 +32,7 @@ index 68f679de00..7685a3635e 100644
  # export GMP_ARCH_PATH=...
  # export MPFR_ARCH_PATH=...
 diff --git a/etc/config.sh/FFTW b/etc/config.sh/FFTW
-index 6d26f9d970..4b79ad7f4b 100644
+index 6d26f9d970..4305f9b3f3 100644
 --- a/etc/config.sh/FFTW
 +++ b/etc/config.sh/FFTW
 @@ -34,8 +34,8 @@
@@ -48,7 +47,7 @@ index 6d26f9d970..4b79ad7f4b 100644
  # END OF (NORMAL) USER EDITABLE PART
  #------------------------------------------------------------------------------
 diff --git a/etc/config.sh/adios2 b/etc/config.sh/adios2
-index 4d2fd7e32c..e5848f2579 100644
+index 7be5374b0c..ef57587de9 100644
 --- a/etc/config.sh/adios2
 +++ b/etc/config.sh/adios2
 @@ -21,8 +21,8 @@
@@ -63,7 +62,7 @@ index 4d2fd7e32c..e5848f2579 100644
  # END OF (NORMAL) USER EDITABLE PART
  #------------------------------------------------------------------------------
 diff --git a/etc/config.sh/cmake b/etc/config.sh/cmake
-index 617ee6dfc9..c58aa36eff 100644
+index 617ee6dfc9..9e1beee716 100644
 --- a/etc/config.sh/cmake
 +++ b/etc/config.sh/cmake
 @@ -29,7 +29,7 @@
@@ -76,7 +75,7 @@ index 617ee6dfc9..c58aa36eff 100644
  # END OF (NORMAL) USER EDITABLE PART
  #------------------------------------------------------------------------------
 diff --git a/etc/config.sh/kahip b/etc/config.sh/kahip
-index 135c4e2dd0..e655321450 100644
+index 135c4e2dd0..83f7b54b71 100644
 --- a/etc/config.sh/kahip
 +++ b/etc/config.sh/kahip
 @@ -36,8 +36,8 @@
@@ -91,7 +90,7 @@ index 135c4e2dd0..e655321450 100644
  # END OF (NORMAL) USER EDITABLE PART
  #------------------------------------------------------------------------------
 diff --git a/etc/config.sh/metis b/etc/config.sh/metis
-index 6242dda174..9150bbd501 100644
+index 6242dda174..34597e8044 100644
 --- a/etc/config.sh/metis
 +++ b/etc/config.sh/metis
 @@ -33,8 +33,8 @@
@@ -106,7 +105,7 @@ index 6242dda174..9150bbd501 100644
  # END OF (NORMAL) USER EDITABLE PART
  #------------------------------------------------------------------------------
 diff --git a/etc/config.sh/petsc b/etc/config.sh/petsc
-index e037dd6bfa..0ae29548eb 100644
+index 265222d262..e53341dfae 100644
 --- a/etc/config.sh/petsc
 +++ b/etc/config.sh/petsc
 @@ -27,8 +27,8 @@
@@ -121,7 +120,7 @@ index e037dd6bfa..0ae29548eb 100644
  # END OF (NORMAL) USER EDITABLE PART
  #------------------------------------------------------------------------------
 diff --git a/etc/config.sh/scotch b/etc/config.sh/scotch
-index 78a56d9d92..f5e27fc36a 100644
+index 78a56d9d92..4561d9c8dc 100644
 --- a/etc/config.sh/scotch
 +++ b/etc/config.sh/scotch
 @@ -33,8 +33,8 @@
@@ -167,7 +166,7 @@ index 8024eb7519..d79f745ec0 100644
  
  # Presume x86_64, with mingw cross-compiled
 diff --git a/src/OSspecific/POSIX/signals/sigFpe.C b/src/OSspecific/POSIX/signals/sigFpe.C
-index 110fff0131..cc1b15621c 100644
+index c02588e19b..bced5de731 100644
 --- a/src/OSspecific/POSIX/signals/sigFpe.C
 +++ b/src/OSspecific/POSIX/signals/sigFpe.C
 @@ -44,7 +44,7 @@ License
@@ -206,9 +205,52 @@ index 110fff0131..cc1b15621c 100644
      if (sigActive_)
      {
          if (verbose)
+diff --git a/wmake/rules/darwin64Clang/c b/wmake/rules/darwin64Clang/c
+index 70c7e06576..dad9ad723b 100644
+--- a/wmake/rules/darwin64Clang/c
++++ b/wmake/rules/darwin64Clang/c
+@@ -14,8 +14,8 @@ ctoo        = $(WM_SCHEDULER) $(cc) $(cFLAGS) -c $< -o $@
+ 
+ LINK_LIBS   = $(cDBUG)
+ 
+-LINKLIBSO   = $(cc) $(cARCH) -Wl,-dylib,-undefined,dynamic_lookup
++LINKLIBSO   = $(cc) $(cARCH) -Wl,-w,-dylib,-undefined,dynamic_lookup
+ 
+-LINKEXE     = $(cc) $(cARCH) -Wl,-execute,-undefined,dynamic_lookup
++LINKEXE     = $(cc) $(cARCH) -Wl,-w,-execute,-undefined,dynamic_lookup
+ 
+ #------------------------------------------------------------------------------
+diff --git a/wmake/rules/darwin64Clang/c++ b/wmake/rules/darwin64Clang/c++
+index 8c2eeba107..ae95f51c8f 100644
+--- a/wmake/rules/darwin64Clang/c++
++++ b/wmake/rules/darwin64Clang/c++
+@@ -16,8 +16,8 @@ cxxtoo      = $(Ctoo)
+ 
+ LINK_LIBS   = $(c++DBUG)
+ 
+-LINKLIBSO   = $(CC) $(c++FLAGS) -Wl,-dylib,-undefined,dynamic_lookup
++LINKLIBSO   = $(CC) $(c++FLAGS) -Wl,-w,-dylib,-undefined,dynamic_lookup
+ 
+-LINKEXE     = $(CC) $(c++FLAGS) -Wl,-execute,-undefined,dynamic_lookup
++LINKEXE     = $(CC) $(c++FLAGS) -Wl,-w,-execute,-undefined,dynamic_lookup
+ 
+ #------------------------------------------------------------------------------
+diff --git a/wmake/rules/darwin64Clang/general b/wmake/rules/darwin64Clang/general
+index c305312685..0e855f9db0 100644
+--- a/wmake/rules/darwin64Clang/general
++++ b/wmake/rules/darwin64Clang/general
+@@ -6,7 +6,7 @@ include $(GENERAL_RULES)/standard
+ # Darwin-specific
+ # ----
+ COMP_OPENMP = -DUSE_OMP -Xpreprocessor -fopenmp
+-LINK_OPENMP = -lomp
++LINK_OPENMP = -L/usr/local/opt/libomp/lib -lomp
+ # ----
+ 
+ ifneq (,$(findstring ~openmp,$(WM_COMPILE_CONTROL)))
 diff --git a/wmake/rules/darwinARM64Clang/c b/wmake/rules/darwinARM64Clang/c
 new file mode 100644
-index 0000000000..462362caef
+index 0000000000..913c2d3c57
 --- /dev/null
 +++ b/wmake/rules/darwinARM64Clang/c
 @@ -0,0 +1,21 @@
@@ -235,7 +277,7 @@ index 0000000000..462362caef
 +#------------------------------------------------------------------------------
 diff --git a/wmake/rules/darwinARM64Clang/c++ b/wmake/rules/darwinARM64Clang/c++
 new file mode 100644
-index 0000000000..912350a6bc
+index 0000000000..459f37b91a
 --- /dev/null
 +++ b/wmake/rules/darwinARM64Clang/c++
 @@ -0,0 +1,23 @@
@@ -331,7 +373,7 @@ index 0000000000..df7ee3493d
 +# ----------------------------------------------------------------------------
 diff --git a/wmake/rules/darwinARM64Clang/general b/wmake/rules/darwinARM64Clang/general
 new file mode 100644
-index 0000000000..c305312685
+index 0000000000..2be1f6f8ff
 --- /dev/null
 +++ b/wmake/rules/darwinARM64Clang/general
 @@ -0,0 +1,22 @@
@@ -343,7 +385,7 @@ index 0000000000..c305312685
 +# Darwin-specific
 +# ----
 +COMP_OPENMP = -DUSE_OMP -Xpreprocessor -fopenmp
-+LINK_OPENMP = -lomp
++LINK_OPENMP = -L/opt/homebrew/opt/libomp/lib -lomp
 +# ----
 +
 +ifneq (,$(findstring ~openmp,$(WM_COMPILE_CONTROL)))
