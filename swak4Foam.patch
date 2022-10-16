@@ -128,8 +128,8 @@ index c00d270..c2f9506 100755
 -wmake funkyPythonPostproc
 +# wmake funkyPythonPostproc
  
- wmake funkySetLagrangianField
- 
+ if [[ $OPENFOAM_ORG > 8.99 ]];
+ then
 diff --git a/maintainanceScripts/makeCopyrightEntries.py b/maintainanceScripts/makeCopyrightEntries.py
 index 47d5500..c2331e6 100755
 --- a/maintainanceScripts/makeCopyrightEntries.py
