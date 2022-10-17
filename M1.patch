@@ -242,7 +242,8 @@ index c305312685..0e855f9db0 100644
 @@ -6,7 +6,7 @@ include $(GENERAL_RULES)/standard
  # Darwin-specific
  # ----
- COMP_OPENMP = -DUSE_OMP -Xpreprocessor -fopenmp
+-COMP_OPENMP = -DUSE_OMP -Xpreprocessor -fopenmp
++COMP_OPENMP = -DUSE_OMP -Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include
 -LINK_OPENMP = -lomp
 +LINK_OPENMP = -L/usr/local/opt/libomp/lib -lomp
  # ----
@@ -384,7 +385,7 @@ index 0000000000..2be1f6f8ff
 +
 +# Darwin-specific
 +# ----
-+COMP_OPENMP = -DUSE_OMP -Xpreprocessor -fopenmp
++COMP_OPENMP = -DUSE_OMP -Xpreprocessor -fopenmp -I/opt/homebrew/opt/libomp/include
 +LINK_OPENMP = -L/opt/homebrew/opt/libomp/lib -lomp
 +# ----
 +
