@@ -70,6 +70,13 @@ brew install --cask paraview
 ### Known issue
 sigFpe is disabled for now until new solution comes.
 
+It is suggested to run parallel command in scripts by using
+```
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+runParallel ***Foam
+```
+to avoid macOS restrictions.
+
 ## swak4Foam
 ### Procedures
 1. Download swak4Foam
