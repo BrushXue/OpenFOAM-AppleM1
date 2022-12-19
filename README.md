@@ -1,8 +1,8 @@
 # OpenFOAM-AppleM1
 
-Patch to compile OpenFOAM-v2206 on M1 Mac.
+Patch to compile OpenFOAM-v2212 on M1 Mac.
 
-## OpenFOAM-v2206
+## OpenFOAM-v2212
 ### Procedures
 1. Create to a **case-sensitive volume** like this
 
@@ -25,30 +25,24 @@ brew tap gerlero/openfoam
 brew install scotch-no-pthread cgal@4
 ```
 
-4. Clone the OpenFOAM source code into this volume
+4. Clone the OpenFOAM source code into this volume (currently use develop branch)
 ```
-git clone https://develop.openfoam.com/Development/openfoam.git OpenFOAM-v2206
-cd OpenFOAM-v2206
-git checkout OpenFOAM-v2206
+git clone https://develop.openfoam.com/Development/openfoam.git OpenFOAM-v2212
+cd OpenFOAM-v2212
+git checkout develop
 git submodule init
 git submodule update
 ```
 
-5. Apply mrklein's patch for OpenFOAM-v2206
-```
-curl -OL https://github.com/mrklein/openfoam-os-x/raw/master/OpenFOAM-v2206.patch
-git apply OpenFOAM-v2206.patch
-```
-
-6. Apply my patch for M1.
+5. Apply my patch for M1.
 ```
 curl -OL https://github.com/BrushXue/OpenFOAM-AppleM1/raw/main/M1.patch
 git apply M1.patch
 ```
 
-7. Add OpenFOAM to `.zshrc` or `.bashrc`
+6. Add OpenFOAM to `.zshrc` or `.bashrc`
 ```
-echo 'source ~/OpenFOAM/OpenFOAM-v2206/etc/bashrc' >> ~./zshrc
+echo 'source ~/OpenFOAM/OpenFOAM-v2212/etc/bashrc' >> ~./zshrc
 ```
 And you probably need to add the following for M1:
 ```
@@ -56,13 +50,13 @@ export CPATH=/opt/homebrew/include
 export LIBRARY_PATH=/opt/homebrew/lib
 ```
 
-8. Compile the code with [bear](https://openfoamwiki.net/index.php/HowTo_Use_OpenFOAM_with_Visual_Studio_Code) (remove `-with-bear` if you don't need it).
+7. Compile the code with [bear](https://openfoamwiki.net/index.php/HowTo_Use_OpenFOAM_with_Visual_Studio_Code) (remove `-with-bear` if you don't need it).
 ```
 ./Allwmake -j -s -l -with-bear
 ```
 It takes 40~45 minutes on M1.
 
-9. Install `paraview` from Homebrew
+8. (Optional)Install `paraview` from Homebrew
 ```
 brew install --cask paraview
 ```
