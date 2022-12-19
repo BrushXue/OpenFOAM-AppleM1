@@ -94,6 +94,7 @@ export PATH="$(brew --prefix)/opt/bison/bin:$PATH"
 ```
 5. Compile the code.
 ```
+export WM_NCOMPPROCS=$(sysctl -n hw.ncpu)
 ./AllwmakeAll
 ```
 It takes approximately 6 minutes on M1.
