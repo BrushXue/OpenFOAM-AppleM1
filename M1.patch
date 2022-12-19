@@ -165,46 +165,21 @@ index 8024eb7519..d79f745ec0 100644
      ;;
  
  # Presume x86_64, with mingw cross-compiled
-diff --git a/src/OSspecific/POSIX/signals/sigFpe.C b/src/OSspecific/POSIX/signals/sigFpe.C
-index c02588e19b..bced5de731 100644
---- a/src/OSspecific/POSIX/signals/sigFpe.C
-+++ b/src/OSspecific/POSIX/signals/sigFpe.C
-@@ -44,7 +44,7 @@ License
-     #include <malloc.h>
- #endif
+diff --git a/src/meshTools/triSurface/triSurfaceTools/geompack/geompack.C b/src/meshTools/triSurface/triSurfaceTools/geompack/geompack.C
+index 7298db6060..b586baf85d 100644
+--- a/src/meshTools/triSurface/triSurfaceTools/geompack/geompack.C
++++ b/src/meshTools/triSurface/triSurfaceTools/geompack/geompack.C
+@@ -6,6 +6,10 @@
+ # include <ctime>
+ # include <cstring>
  
--#ifdef __APPLE__
-+#if defined(__APPLE__) && defined(__x86_64__)
-     #include "feexceptErsatz.H"
- #endif
++#if defined(__APPLE__) && defined(__clang__)
++#pragma clang fp exceptions(ignore)
++#endif
++
+ using namespace std;
  
-@@ -117,7 +117,7 @@ void* Foam::sigFpe::mallocNan(size_t size)
- 
- void Foam::sigFpe::sigHandler(int)
- {
--    #if (defined(__linux__) && defined(__GNUC__)) || defined(__APPLE__)
-+    #if (defined(__linux__) && defined(__GNUC__)) || (defined(__APPLE__) && defined(__x86_64__))
- 
-     resetHandler("SIGFPE", SIGFPE);
- 
-@@ -184,7 +184,7 @@ void Foam::sigFpe::set(bool verbose)
- {
-     if (!sigActive_ && requested())
-     {
--        #if (defined(__linux__) && defined(__GNUC__)) || defined(__APPLE__)
-+        #if (defined(__linux__) && defined(__GNUC__)) || (defined(__APPLE__) && defined(__x86_64__))
- 
-         feenableexcept
-         (
-@@ -240,7 +240,7 @@ void Foam::sigFpe::set(bool verbose)
- 
- void Foam::sigFpe::unset(bool verbose)
- {
--    #if (defined(__linux__) && defined(__GNUC__)) || defined(__APPLE__)
-+    #if (defined(__linux__) && defined(__GNUC__)) || (defined(__APPLE__) && defined(__x86_64__))
-     if (sigActive_)
-     {
-         if (verbose)
+ # include "geompack.H"
 diff --git a/wmake/rules/darwin64Clang/c b/wmake/rules/darwin64Clang/c
 index 70c7e06576..dad9ad723b 100644
 --- a/wmake/rules/darwin64Clang/c
@@ -236,25 +211,26 @@ index 8c2eeba107..ae95f51c8f 100644
  
  #------------------------------------------------------------------------------
 diff --git a/wmake/rules/darwin64Clang/general b/wmake/rules/darwin64Clang/general
-index c305312685..0e855f9db0 100644
+index c305312685..88dc9ab61b 100644
 --- a/wmake/rules/darwin64Clang/general
 +++ b/wmake/rules/darwin64Clang/general
-@@ -6,7 +6,7 @@ include $(GENERAL_RULES)/standard
+@@ -5,8 +5,8 @@ include $(GENERAL_RULES)/standard
+ 
  # Darwin-specific
  # ----
 -COMP_OPENMP = -DUSE_OMP -Xpreprocessor -fopenmp
-+COMP_OPENMP = -DUSE_OMP -Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include
 -LINK_OPENMP = -lomp
++COMP_OPENMP = -DUSE_OMP -Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include
 +LINK_OPENMP = -L/usr/local/opt/libomp/lib -lomp
  # ----
  
  ifneq (,$(findstring ~openmp,$(WM_COMPILE_CONTROL)))
 diff --git a/wmake/rules/darwinARM64Clang/c b/wmake/rules/darwinARM64Clang/c
 new file mode 100644
-index 0000000000..913c2d3c57
+index 0000000000..cd9c6ff9e7
 --- /dev/null
 +++ b/wmake/rules/darwinARM64Clang/c
-@@ -0,0 +1,21 @@
+@@ -0,0 +1,23 @@
 +#------------------------------------------------------------------------------
 +include $(GENERAL_RULES)/Clang/c
 +
@@ -265,7 +241,9 @@ index 0000000000..913c2d3c57
 +# Compile option is non-mandatory, but must be non-empty
 +sinclude $(DEFAULT_RULES)/c$(WM_COMPILE_OPTION)
 +
-+cFLAGS      = $(cARCH) $(GFLAGS) $(cWARN) $(cOPT) $(cDBUG) $(LIB_HEADER_DIRS) -fPIC
++cFLAGS      = \
++    $(cARCH) $(GFLAGS) $(cWARN) $(cOPT) $(cDBUG) \
++    $(FOAM_EXTRA_CFLAGS) $(LIB_HEADER_DIRS) -fPIC
 +
 +ctoo        = $(WM_SCHEDULER) $(cc) $(cFLAGS) -c $< -o $@
 +
@@ -278,10 +256,10 @@ index 0000000000..913c2d3c57
 +#------------------------------------------------------------------------------
 diff --git a/wmake/rules/darwinARM64Clang/c++ b/wmake/rules/darwinARM64Clang/c++
 new file mode 100644
-index 0000000000..459f37b91a
+index 0000000000..3bf10d58b0
 --- /dev/null
 +++ b/wmake/rules/darwinARM64Clang/c++
-@@ -0,0 +1,23 @@
+@@ -0,0 +1,25 @@
 +#------------------------------------------------------------------------------
 +include $(GENERAL_RULES)/Clang/c++
 +
@@ -291,7 +269,9 @@ index 0000000000..459f37b91a
 +
 +include $(DEFAULT_RULES)/c++$(WM_COMPILE_OPTION)
 +
-+c++FLAGS    = $(c++ARCH) $(GFLAGS) $(c++WARN) $(c++OPT) $(c++DBUG) $(ptFLAGS) $(LIB_HEADER_DIRS) -fPIC
++c++FLAGS    = \
++    $(c++ARCH) $(GFLAGS) $(c++WARN) $(c++OPT) $(c++DBUG) $(ptFLAGS) \
++    $(FOAM_EXTRA_CXXFLAGS) $(LIB_HEADER_DIRS) -fPIC
 +
 +Ctoo        = $(WM_SCHEDULER) $(CC) $(c++FLAGS) -c $< -o $@
 +cctoo       = $(Ctoo)
@@ -355,10 +335,10 @@ index 0000000000..ca3ac9bf5f
 +cOPT        = -O2
 diff --git a/wmake/rules/darwinARM64Clang/cgal b/wmake/rules/darwinARM64Clang/cgal
 new file mode 100644
-index 0000000000..df7ee3493d
+index 0000000000..2f376af1e1
 --- /dev/null
 +++ b/wmake/rules/darwinARM64Clang/cgal
-@@ -0,0 +1,13 @@
+@@ -0,0 +1,14 @@
 +# ----------------------------------------------------------------------------
 +# CGAL on Darwin
 +# CGAL (library version) without mpfr
@@ -369,12 +349,13 @@ index 0000000000..df7ee3493d
 +
 +CGAL_LIBS = \
 +    $(foreach dir,$(BOOST_LIB_DIR),-L$(dir)) \
-+    $(foreach dir,$(CGAL_LIB_DIR),-L$(dir))
++    $(foreach dir,$(CGAL_LIB_DIR),-L$(dir)) \
++    -lCGAL
 +
 +# ----------------------------------------------------------------------------
 diff --git a/wmake/rules/darwinARM64Clang/general b/wmake/rules/darwinARM64Clang/general
 new file mode 100644
-index 0000000000..2be1f6f8ff
+index 0000000000..3a88c37947
 --- /dev/null
 +++ b/wmake/rules/darwinARM64Clang/general
 @@ -0,0 +1,22 @@
