@@ -25,11 +25,11 @@ brew tap gerlero/openfoam
 brew install scotch-no-pthread cgal@4
 ```
 
-4. Clone the OpenFOAM source code into this volume (currently use develop branch)
+4. Clone the OpenFOAM source code into this volume
 ```
 git clone https://develop.openfoam.com/Development/openfoam.git OpenFOAM-v2212
 cd OpenFOAM-v2212
-git checkout develop
+git checkout OpenFOAM-v2212
 git submodule init
 git submodule update
 ```
