@@ -16,7 +16,7 @@ cd ~/OpenFOAM
 
 2. Install these components from homebrew
 ```
-brew install cmake open-mpi libomp adios2 boost fftw kahip metis 
+brew install cmake open-mpi libomp adios2 boost fftw kahip metis petsc hypre
 ```
 
 3. Install modifiled `scotch` and `CGAL@4` (Thanks to @gerlero for creating this [tap](https://github.com/gerlero/homebrew-openfoam/tree/main/Formula))
