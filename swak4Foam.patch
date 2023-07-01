@@ -25,15 +25,6 @@ index 904d6a3..e56c417 100755
  if [[ $? != 0 ]]; then
      echo "Some scripts require a binary 'python' to be installed"
      echo "It doesn't matter if this is Python 2 or 3"
-@@ -86,7 +86,7 @@ fi
- BEARPATH=$(which bear)
- if [[ $? == 0 ]]; then
-     echo "Using ${BEARPATH} to build compilation database"
--    export BEAR_COMPILE_PREFIX="bear --append --cdb=$(pwd)/compile_commands.json"
-+    export BEAR_COMPILE_PREFIX="bear --append --output $(pwd)/compile_commands.json --"
- else
-     echo "No 'bear' installed"
- fi
 diff --git a/AllwmakeAll b/AllwmakeAll
 index 8f599f3..5aa4356 100755
 --- a/AllwmakeAll
@@ -128,7 +119,7 @@ index c00d270..c2f9506 100755
 -wmake funkyPythonPostproc
 +# wmake funkyPythonPostproc
  
- if [[ $OPENFOAM_ORG > 8.99 ]];
+ if [[ "$OPENFOAM_ORG" != "" && $(( $OPENFOAM_ORG > 8 )) ]];
  then
 diff --git a/maintainanceScripts/makeCopyrightEntries.py b/maintainanceScripts/makeCopyrightEntries.py
 index 47d5500..c2331e6 100755
