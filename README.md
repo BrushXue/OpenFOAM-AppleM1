@@ -1,8 +1,8 @@
 # OpenFOAM-AppleM1
 
-Patch to compile OpenFOAM-v2212 on M1 Mac.
+Patch to compile OpenFOAM-v2306 on M1 Mac.
 
-## OpenFOAM-v2212
+## OpenFOAM-v2306
 ### Procedures
 1. Create to a **case-sensitive volume** like this
 
@@ -27,9 +27,9 @@ brew install scotch-no-pthread cgal@4
 
 4. Clone the OpenFOAM source code into this volume
 ```
-git clone https://develop.openfoam.com/Development/openfoam.git OpenFOAM-v2212
-cd OpenFOAM-v2212
-git checkout OpenFOAM-v2212
+git clone https://develop.openfoam.com/Development/openfoam.git OpenFOAM-v2306
+cd OpenFOAM-v2306
+git checkout OpenFOAM-v2306
 git submodule init
 git submodule update
 ```
@@ -42,7 +42,7 @@ git apply M1.patch
 
 6. Add OpenFOAM to `.zshrc` or `.bashrc`
 ```
-echo 'source ~/OpenFOAM/OpenFOAM-v2212/etc/bashrc' >> ~./zshrc
+echo 'source ~/OpenFOAM/OpenFOAM-v2306/etc/bashrc' >> ~./zshrc
 ```
 And you probably need to add the following for M1:
 ```
@@ -73,20 +73,20 @@ to avoid macOS restrictions.
 
 ## swak4Foam
 ### Procedures
-1. Download swak4Foam
+1. Install these components from homebrew:
+```
+brew install bison pkgconfig mercurial
+```
+2. Download swak4Foam
 ```
 hg clone http://hg.code.sf.net/p/openfoam-extend/swak4Foam swak4Foam
 cd swak4Foam
 hg update develop
 ```
-2. Apply my patch for macOS.
+3. Apply my patch for macOS.
 ```
 curl -OL https://github.com/BrushXue/OpenFOAM-AppleM1/raw/main/swak4Foam.patch
 git apply swak4Foam.patch
-```
-3. Install these components from homebrew:
-```
-brew install bison pkgconfig
 ```
 4. Add bison to the path:
 ```
