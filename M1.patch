@@ -1,5 +1,5 @@
 diff --git a/etc/bashrc b/etc/bashrc
-index 857ffaa370..e54cfeec8e 100644
+index 857ffaa370..35c659a9eb 100644
 --- a/etc/bashrc
 +++ b/etc/bashrc
 @@ -129,7 +129,7 @@ projectDir="$HOME/OpenFOAM/OpenFOAM-$WM_PROJECT_VERSION"
@@ -7,7 +7,7 @@ index 857ffaa370..e54cfeec8e 100644
  #               - overrides the 'trapFpe' controlDict entry
  # = true | false
 -#export FOAM_SIGFPE=true
-+#export FOAM_SIGFPE=false
++export FOAM_SIGFPE=false
  
  # [FOAM_SETNAN] - Initialize memory with NaN
  #               - overrides the 'setNaN' controlDict entry
@@ -27,7 +27,7 @@ index 68f679de00..8d7173d9fc 100644
 -export BOOST_ARCH_PATH="$WM_THIRD_PARTY_DIR/platforms/$WM_ARCH$WM_COMPILER/$boost_version"
 -export CGAL_ARCH_PATH="$WM_THIRD_PARTY_DIR/platforms/$WM_ARCH$WM_COMPILER/$cgal_version"
 +export BOOST_ARCH_PATH=$(brew --prefix boost)
-+export CGAL_ARCH_PATH=$(brew --prefix cgal)
++export CGAL_ARCH_PATH=$(brew --prefix cgal@4)
  
  # export GMP_ARCH_PATH=...
  # export MPFR_ARCH_PATH=...
@@ -135,7 +135,7 @@ index c512ebb376..41e441c3ab 100644
  # END OF (NORMAL) USER EDITABLE PART
  #------------------------------------------------------------------------------
 diff --git a/etc/config.sh/scotch b/etc/config.sh/scotch
-index bb7261a059..6dd6202f41 100644
+index bb7261a059..4063f4c77a 100644
 --- a/etc/config.sh/scotch
 +++ b/etc/config.sh/scotch
 @@ -35,8 +35,8 @@
@@ -161,8 +161,48 @@ index 7735c4cf41..3eb37fdd02 100644
      # Defult to clang (not gcc) as system compiler
      if [ "$WM_COMPILER" = Gcc ]
      then
+diff --git a/src/OSspecific/POSIX/signals/sigFpe.C b/src/OSspecific/POSIX/signals/sigFpe.C
+index c02588e19b..bced5de731 100644
+--- a/src/OSspecific/POSIX/signals/sigFpe.C
++++ b/src/OSspecific/POSIX/signals/sigFpe.C
+@@ -44,7 +44,7 @@ License
+     #include <malloc.h>
+ #endif
+ 
+-#ifdef __APPLE__
++#if defined(__APPLE__) && defined(__x86_64__)
+     #include "feexceptErsatz.H"
+ #endif
+ 
+@@ -117,7 +117,7 @@ void* Foam::sigFpe::mallocNan(size_t size)
+ 
+ void Foam::sigFpe::sigHandler(int)
+ {
+-    #if (defined(__linux__) && defined(__GNUC__)) || defined(__APPLE__)
++    #if (defined(__linux__) && defined(__GNUC__)) || (defined(__APPLE__) && defined(__x86_64__))
+ 
+     resetHandler("SIGFPE", SIGFPE);
+ 
+@@ -184,7 +184,7 @@ void Foam::sigFpe::set(bool verbose)
+ {
+     if (!sigActive_ && requested())
+     {
+-        #if (defined(__linux__) && defined(__GNUC__)) || defined(__APPLE__)
++        #if (defined(__linux__) && defined(__GNUC__)) || (defined(__APPLE__) && defined(__x86_64__))
+ 
+         feenableexcept
+         (
+@@ -240,7 +240,7 @@ void Foam::sigFpe::set(bool verbose)
+ 
+ void Foam::sigFpe::unset(bool verbose)
+ {
+-    #if (defined(__linux__) && defined(__GNUC__)) || defined(__APPLE__)
++    #if (defined(__linux__) && defined(__GNUC__)) || (defined(__APPLE__) && defined(__x86_64__))
+     if (sigActive_)
+     {
+         if (verbose)
 diff --git a/wmake/rules/darwin64Clang/c b/wmake/rules/darwin64Clang/c
-index d145bd5b92..21ba6abb06 100644
+index d145bd5b92..30475a39a2 100644
 --- a/wmake/rules/darwin64Clang/c
 +++ b/wmake/rules/darwin64Clang/c
 @@ -1,7 +1,7 @@
@@ -170,7 +210,7 @@ index d145bd5b92..21ba6abb06 100644
  include $(GENERAL_RULES)/Clang/c
  
 -cARCH      := -m64 -ftrapping-math
-+cARCH      := -m64 -ftrapping-math -Wno-unsupported-floating-point-opt
++cARCH      :=
  
  ifneq (,$(strip $(WM_COMPILE_OPTION)))
      sinclude $(DEFAULT_RULES)/c$(WM_COMPILE_OPTION)
@@ -179,14 +219,14 @@ index d145bd5b92..21ba6abb06 100644
  LINK_LIBS   = $(cDBUG)
  
 -LINKLIBSO   = $(cc) $(cARCH) -Wl,-dylib,-undefined,dynamic_lookup
-+LINKLIBSO   = $(cc) $(cARCH) -Wl,-w,-dylib,-undefined,dynamic_lookup
++LINKLIBSO   = $(cc) $(cARCH) -Wl,-undefined,dynamic_lookup,-no_fixup_chains,-dylib
  
 -LINKEXE     = $(cc) $(cARCH) -Wl,-execute,-undefined,dynamic_lookup
-+LINKEXE     = $(cc) $(cARCH) -Wl,-w,-execute,-undefined,dynamic_lookup
++LINKEXE     = $(cc) $(cARCH) -Wl,-undefined,dynamic_lookup,-no_fixup_chains,-execute
  
  #------------------------------------------------------------------------------
 diff --git a/wmake/rules/darwin64Clang/c++ b/wmake/rules/darwin64Clang/c++
-index 7547b28d53..0eb1db89f7 100644
+index 7547b28d53..bebcf1c828 100644
 --- a/wmake/rules/darwin64Clang/c++
 +++ b/wmake/rules/darwin64Clang/c++
 @@ -1,7 +1,7 @@
@@ -194,7 +234,7 @@ index 7547b28d53..0eb1db89f7 100644
  include $(GENERAL_RULES)/Clang/c++
  
 -c++ARCH    := -m64 -pthread -ftrapping-math
-+c++ARCH    := -m64 -pthread -ftrapping-math -Wno-unsupported-floating-point-opt
++c++ARCH    := -pthread
  
  ifneq (,$(strip $(WM_COMPILE_OPTION)))
      sinclude $(DEFAULT_RULES)/c++$(WM_COMPILE_OPTION)
@@ -203,10 +243,10 @@ index 7547b28d53..0eb1db89f7 100644
  LINK_LIBS   = $(c++DBUG)
  
 -LINKLIBSO   = $(CC) $(c++FLAGS) -Wl,-dylib,-undefined,dynamic_lookup
-+LINKLIBSO   = $(CC) $(c++FLAGS) -Wl,-w,-dylib,-undefined,dynamic_lookup
++LINKLIBSO   = $(CC) $(c++FLAGS) -Wl,-undefined,dynamic_lookup,-no_fixup_chains,-dylib
  
 -LINKEXE     = $(CC) $(c++FLAGS) -Wl,-execute,-undefined,dynamic_lookup
-+LINKEXE     = $(CC) $(c++FLAGS) -Wl,-w,-execute,-undefined,dynamic_lookup
++LINKEXE     = $(CC) $(c++FLAGS) -Wl,-undefined,dynamic_lookup,-no_fixup_chains,-execute
  
  #------------------------------------------------------------------------------
 diff --git a/wmake/rules/darwin64Clang/general b/wmake/rules/darwin64Clang/general
