@@ -16,13 +16,13 @@ cd ~/OpenFOAM
 
 2. Install these components from homebrew
 ```
-brew install cmake open-mpi libomp adios2 boost cgal fftw kahip metis petsc hypre
+brew install cmake open-mpi libomp adios2 boost fftw kahip metis petsc hypre
 ```
 
-3. Install modifiled `scotch` (Thanks to @gerlero for creating this [tap](https://github.com/gerlero/homebrew-openfoam/tree/main/Formula))
+3. Install legacy `Scotch` and `CGAL` (Thanks to @gerlero for creating this [tap](https://github.com/gerlero/homebrew-openfoam/tree/main/Formula))
 ```
 brew tap gerlero/openfoam
-brew install scotch-no-pthread
+brew install scotch-no-pthread cgal@4
 ```
 
 4. Clone the OpenFOAM source code into this volume
