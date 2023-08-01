@@ -42,9 +42,9 @@ git apply M1.patch
 
 6. Add OpenFOAM to `.zshrc` or `.bashrc`
 ```
-echo 'source ~/OpenFOAM/OpenFOAM-v2306/etc/bashrc' >> ~./zshrc
+echo 'source ~/OpenFOAM/OpenFOAM-v2306/etc/bashrc' >> ~/.zshrc
 ```
-And you probably need to add the following for M1:
+And you need to add the following for M1 (not for x86):
 ```
 export CPATH=/opt/homebrew/include
 export LIBRARY_PATH=/opt/homebrew/lib
