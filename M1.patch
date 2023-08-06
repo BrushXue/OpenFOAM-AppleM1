@@ -1,16 +1,3 @@
-diff --git a/etc/bashrc b/etc/bashrc
-index 857ffaa370..35c659a9eb 100644
---- a/etc/bashrc
-+++ b/etc/bashrc
-@@ -129,7 +129,7 @@ projectDir="$HOME/OpenFOAM/OpenFOAM-$WM_PROJECT_VERSION"
- # [FOAM_SIGFPE] - Trap floating-point exceptions.
- #               - overrides the 'trapFpe' controlDict entry
- # = true | false
--#export FOAM_SIGFPE=true
-+export FOAM_SIGFPE=false
- 
- # [FOAM_SETNAN] - Initialize memory with NaN
- #               - overrides the 'setNaN' controlDict entry
 diff --git a/etc/config.sh/CGAL b/etc/config.sh/CGAL
 index 68f679de00..8d7173d9fc 100644
 --- a/etc/config.sh/CGAL
@@ -161,48 +148,124 @@ index 7735c4cf41..3eb37fdd02 100644
      # Defult to clang (not gcc) as system compiler
      if [ "$WM_COMPILER" = Gcc ]
      then
+diff --git a/src/OSspecific/POSIX/signals/feexceptErsatz.H b/src/OSspecific/POSIX/signals/feexceptErsatz.H
+index e48b627758..d1f25226cf 100644
+--- a/src/OSspecific/POSIX/signals/feexceptErsatz.H
++++ b/src/OSspecific/POSIX/signals/feexceptErsatz.H
+@@ -38,20 +38,20 @@ inline int feenableexcept(unsigned int excepts)
+         return -1;
+     }
+ 
+-#if defined __arm64__
+-    old_excepts = fenv.__fpcr & FE_ALL_EXCEPT;
+-#else
++    #if defined __arm64__
++    old_excepts = fenv.__fpsr & FE_ALL_EXCEPT;
++    #else
+     old_excepts = fenv.__control & FE_ALL_EXCEPT;
+-#endif
++    #endif
+ 
+     // unmask
+-#if defined __arm64__
+-    fenv.__fpcr &= ~new_excepts;
+-    fenv.__fpsr &= ~(new_excepts << 7);
+-#else
++    #if defined __arm64__
++    fenv.__fpsr |= new_excepts;
++    fenv.__fpcr |= new_excepts << 8;
++    #else
+     fenv.__control &= ~new_excepts;
+     fenv.__mxcsr   &= ~(new_excepts << 7);
+-#endif
++    #endif
+ 
+     return fesetenv(&fenv) ? -1 : old_excepts;
+ }
+@@ -68,20 +68,20 @@ inline int fedisableexcept(unsigned int excepts)
+         return -1;
+     }
+ 
+-#if defined __arm64__
+-    old_excepts = fenv.__fpcr & FE_ALL_EXCEPT;
+-#else
++    #if defined __arm64__
++    old_excepts = fenv.__fpsr & FE_ALL_EXCEPT;
++    #else
+     old_excepts = fenv.__control & FE_ALL_EXCEPT;
+-#endif
++    #endif
+ 
+     // mask
+-#if defined __arm64__
+-    fenv.__fpcr |= new_excepts;
+-    fenv.__fpsr |= new_excepts << 7;
+-#else
++    #if defined __arm64__
++    fenv.__fpsr &= ~new_excepts;
++    fenv.__fpcr &= ~(new_excepts << 8);
++    #else
+     fenv.__control |= new_excepts;
+     fenv.__mxcsr   |= new_excepts << 7;
+-#endif
++    #endif
+ 
+     return fesetenv(&fenv) ? -1 : old_excepts;
+ }
 diff --git a/src/OSspecific/POSIX/signals/sigFpe.C b/src/OSspecific/POSIX/signals/sigFpe.C
-index c02588e19b..bced5de731 100644
+index c02588e19b..b7d6c7ee75 100644
 --- a/src/OSspecific/POSIX/signals/sigFpe.C
 +++ b/src/OSspecific/POSIX/signals/sigFpe.C
-@@ -44,7 +44,7 @@ License
-     #include <malloc.h>
- #endif
- 
--#ifdef __APPLE__
-+#if defined(__APPLE__) && defined(__x86_64__)
-     #include "feexceptErsatz.H"
- #endif
- 
-@@ -117,7 +117,7 @@ void* Foam::sigFpe::mallocNan(size_t size)
- 
+@@ -118,13 +118,16 @@ void* Foam::sigFpe::mallocNan(size_t size)
  void Foam::sigFpe::sigHandler(int)
  {
--    #if (defined(__linux__) && defined(__GNUC__)) || defined(__APPLE__)
-+    #if (defined(__linux__) && defined(__GNUC__)) || (defined(__APPLE__) && defined(__x86_64__))
- 
+     #if (defined(__linux__) && defined(__GNUC__)) || defined(__APPLE__)
+-
++    // Workaround for Apple Silicon
++    #if defined(__APPLE__) && defined(__arm64__)
++    resetHandler("SIGFPE", SIGILL);
++    #else
      resetHandler("SIGFPE", SIGFPE);
+-
++    #endif
+     JobInfo::shutdown();        // From running -> finished
+     error::printStack(Perr);
+     ::raise(SIGFPE);            // Throw signal (to old handler)
+-
++    
+     #endif  // (__linux__ && __GNUC__) || __APPLE__
+ }
  
-@@ -184,7 +184,7 @@ void Foam::sigFpe::set(bool verbose)
- {
-     if (!sigActive_ && requested())
-     {
--        #if (defined(__linux__) && defined(__GNUC__)) || defined(__APPLE__)
-+        #if (defined(__linux__) && defined(__GNUC__)) || (defined(__APPLE__) && defined(__x86_64__))
+@@ -192,8 +195,12 @@ void Foam::sigFpe::set(bool verbose)
+           | FE_INVALID
+           | FE_OVERFLOW
+         );
+-
++        // Workaround for Apple Silicon
++        #if defined(__APPLE__) && defined(__arm64__)
++        setHandler("SIGFPE", SIGILL, sigHandler);
++        #else
+         setHandler("SIGFPE", SIGFPE, sigHandler);
++        #endif
  
-         feenableexcept
-         (
-@@ -240,7 +240,7 @@ void Foam::sigFpe::set(bool verbose)
+         sigActive_ = true;
+         #endif
+@@ -248,8 +255,12 @@ void Foam::sigFpe::unset(bool verbose)
+             Info<< "sigFpe : Disabling floating point exception trapping"
+                 << endl;
+         }
+-
++        // Workaround for Apple Silicon
++        #if defined(__APPLE__) && defined(__arm64__)
++        resetHandler("SIGFPE", SIGILL);
++        #else
+         resetHandler("SIGFPE", SIGFPE);
++        #endif
  
- void Foam::sigFpe::unset(bool verbose)
- {
--    #if (defined(__linux__) && defined(__GNUC__)) || defined(__APPLE__)
-+    #if (defined(__linux__) && defined(__GNUC__)) || (defined(__APPLE__) && defined(__x86_64__))
-     if (sigActive_)
-     {
-         if (verbose)
+         // Reset exception raising
+         const int oldExcept = fedisableexcept
 diff --git a/wmake/rules/darwin64Clang/c b/wmake/rules/darwin64Clang/c
-index d145bd5b92..30475a39a2 100644
+index d145bd5b92..9e40bdef57 100644
 --- a/wmake/rules/darwin64Clang/c
 +++ b/wmake/rules/darwin64Clang/c
 @@ -1,7 +1,7 @@
@@ -210,7 +273,7 @@ index d145bd5b92..30475a39a2 100644
  include $(GENERAL_RULES)/Clang/c
  
 -cARCH      := -m64 -ftrapping-math
-+cARCH      :=
++cARCH      := -ftrapping-math -ffp-contract=off
  
  ifneq (,$(strip $(WM_COMPILE_OPTION)))
      sinclude $(DEFAULT_RULES)/c$(WM_COMPILE_OPTION)
@@ -226,7 +289,7 @@ index d145bd5b92..30475a39a2 100644
  
  #------------------------------------------------------------------------------
 diff --git a/wmake/rules/darwin64Clang/c++ b/wmake/rules/darwin64Clang/c++
-index 7547b28d53..bebcf1c828 100644
+index 7547b28d53..0ca8df4660 100644
 --- a/wmake/rules/darwin64Clang/c++
 +++ b/wmake/rules/darwin64Clang/c++
 @@ -1,7 +1,7 @@
@@ -234,7 +297,7 @@ index 7547b28d53..bebcf1c828 100644
  include $(GENERAL_RULES)/Clang/c++
  
 -c++ARCH    := -m64 -pthread -ftrapping-math
-+c++ARCH    := -pthread
++c++ARCH    := -pthread -ftrapping-math -ffp-contract=off
  
  ifneq (,$(strip $(WM_COMPILE_OPTION)))
      sinclude $(DEFAULT_RULES)/c++$(WM_COMPILE_OPTION)
