@@ -62,7 +62,7 @@ brew install --cask paraview
 ```
 
 ### Known issue
-sigFpe is disabled for now until new solution comes.
+Currently on Apple Silicon, floating point exception will trigger SIGILL instead of SIGFPE. I use a workaround that can trigger OpenFOAM SIGFPE. However it's not a perfect solution.
 
 It is suggested to run parallel command in scripts by using
 ```
