@@ -213,10 +213,10 @@ index e48b627758..d1f25226cf 100644
      return fesetenv(&fenv) ? -1 : old_excepts;
  }
 diff --git a/src/OSspecific/POSIX/signals/sigFpe.C b/src/OSspecific/POSIX/signals/sigFpe.C
-index c02588e19b..b7d6c7ee75 100644
+index c02588e19b..2824f63bcc 100644
 --- a/src/OSspecific/POSIX/signals/sigFpe.C
 +++ b/src/OSspecific/POSIX/signals/sigFpe.C
-@@ -118,13 +118,16 @@ void* Foam::sigFpe::mallocNan(size_t size)
+@@ -118,9 +118,12 @@ void* Foam::sigFpe::mallocNan(size_t size)
  void Foam::sigFpe::sigHandler(int)
  {
      #if (defined(__linux__) && defined(__GNUC__)) || defined(__APPLE__)
@@ -231,11 +231,6 @@ index c02588e19b..b7d6c7ee75 100644
      JobInfo::shutdown();        // From running -> finished
      error::printStack(Perr);
      ::raise(SIGFPE);            // Throw signal (to old handler)
--
-+
-     #endif  // (__linux__ && __GNUC__) || __APPLE__
- }
- 
 @@ -192,8 +195,12 @@ void Foam::sigFpe::set(bool verbose)
            | FE_INVALID
            | FE_OVERFLOW
