@@ -232,7 +232,7 @@ index c02588e19b..b7d6c7ee75 100644
      error::printStack(Perr);
      ::raise(SIGFPE);            // Throw signal (to old handler)
 -
-+    
++
      #endif  // (__linux__ && __GNUC__) || __APPLE__
  }
  
