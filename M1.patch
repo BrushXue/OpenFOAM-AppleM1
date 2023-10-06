@@ -14,7 +14,7 @@ index 68f679de00..8d7173d9fc 100644
 -export BOOST_ARCH_PATH="$WM_THIRD_PARTY_DIR/platforms/$WM_ARCH$WM_COMPILER/$boost_version"
 -export CGAL_ARCH_PATH="$WM_THIRD_PARTY_DIR/platforms/$WM_ARCH$WM_COMPILER/$cgal_version"
 +export BOOST_ARCH_PATH=$(brew --prefix boost)
-+export CGAL_ARCH_PATH=$(brew --prefix cgal@4)
++export CGAL_ARCH_PATH=$(brew --prefix cgal)
  
  # export GMP_ARCH_PATH=...
  # export MPFR_ARCH_PATH=...
