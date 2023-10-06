@@ -2,7 +2,7 @@ diff --git a/etc/config.sh/CGAL b/etc/config.sh/CGAL
 index 68f679de00..8d7173d9fc 100644
 --- a/etc/config.sh/CGAL
 +++ b/etc/config.sh/CGAL
-@@ -43,11 +43,11 @@
+@@ -43,14 +43,14 @@
  #------------------------------------------------------------------------------
  # USER EDITABLE PART: Changes made here may be lost with the next upgrade
  
@@ -14,10 +14,15 @@ index 68f679de00..8d7173d9fc 100644
 -export BOOST_ARCH_PATH="$WM_THIRD_PARTY_DIR/platforms/$WM_ARCH$WM_COMPILER/$boost_version"
 -export CGAL_ARCH_PATH="$WM_THIRD_PARTY_DIR/platforms/$WM_ARCH$WM_COMPILER/$cgal_version"
 +export BOOST_ARCH_PATH=$(brew --prefix boost)
-+export CGAL_ARCH_PATH=$(brew --prefix cgal@4)
++export CGAL_ARCH_PATH=$(brew --prefix cgal)
  
- # export GMP_ARCH_PATH=...
- # export MPFR_ARCH_PATH=...
+-# export GMP_ARCH_PATH=...
+-# export MPFR_ARCH_PATH=...
++export GMP_ARCH_PATH=$(brew --prefix gmp)
++export MPFR_ARCH_PATH=$(brew --prefix mpfr)
+ 
+ # END OF (NORMAL) USER EDITABLE PART
+ #------------------------------------------------------------------------------
 diff --git a/etc/config.sh/FFTW b/etc/config.sh/FFTW
 index 6d26f9d970..d63f0feacb 100644
 --- a/etc/config.sh/FFTW
