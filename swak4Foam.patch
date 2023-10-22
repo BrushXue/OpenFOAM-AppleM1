@@ -13,7 +13,7 @@ index 74f7bb3..2e4a64f 100755
  
  rm -f foamVersionThisIsCompiledFor
 diff --git a/Allwmake b/Allwmake
-index 904d6a3..e56c417 100755
+index 40e8cd1..9b10b94 100755
 --- a/Allwmake
 +++ b/Allwmake
 @@ -7,7 +7,7 @@ if [ -z "$WM_PROJECT_VERSION" ]; then
@@ -25,67 +25,196 @@ index 904d6a3..e56c417 100755
  if [[ $? != 0 ]]; then
      echo "Some scripts require a binary 'python' to be installed"
      echo "It doesn't matter if this is Python 2 or 3"
-diff --git a/AllwmakeAll b/AllwmakeAll
-index 8f599f3..5aa4356 100755
---- a/AllwmakeAll
-+++ b/AllwmakeAll
-@@ -1,6 +1,6 @@
- #! /bin/bash
+diff --git a/Libraries/rules/versionOptions b/Libraries/rules/versionOptions
+index e8fe2fe..2abba0e 100644
+--- a/Libraries/rules/versionOptions
++++ b/Libraries/rules/versionOptions
+@@ -4,16 +4,16 @@
+ # Where am I
+ SELF_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
  
--./maintainanceScripts/compileRequirements.sh
-+#./maintainanceScripts/compileRequirements.sh
+-ECHO_CMD = /bin/echo
++# ECHO_CMD = /bin/echo
  
- if [ ! -e ./swakConfiguration ] ; then
-     echo "Using automatic swakConfiguration because none is there"
-diff --git a/Libraries/languageIntegration/Allwmake b/Libraries/languageIntegration/Allwmake
-index f5363a2..2623e0f 100755
---- a/Libraries/languageIntegration/Allwmake
-+++ b/Libraries/languageIntegration/Allwmake
-@@ -11,26 +11,26 @@ fi
+-num-sort = $(shell $(ECHO_CMD) -e $(subst :,'\n',$1) | sort --general-numeric-sort --key=1,1 -)
++# num-sort = $(shell $(ECHO_CMD) $(subst :,'\n',$1) | sort --general-numeric-sort --key=1,1 -)
  
- wmake libso swakGeneralLanguageIntegration
+ # Generated file with information about the current foam version
+ include $(SELF_DIR)foamVersion
  
--if [ "$SWAK_PYTHON2_INCLUDE" != "" ]
--then
--    SOEXT=so
-+# if [ "$SWAK_PYTHON2_INCLUDE" != "" ]
-+# then
-+#     SOEXT=so
+ ifdef FOAM_DEV
+ FOAM_DEV_OPTION = -DFOAM_DEV
+-  ifeq "4.1" "$(word 1, $(call num-sort,4.1:$(WM_PROJECT_VERSION_NUM)))"
++  ifeq "4.1" "$(word 1, $(sort 4.1 $(WM_PROJECT_VERSION)))"
+     SWAK_IMMERSED_BC_LIB=-limmersedBoundary
+   endif
+ endif
+@@ -51,7 +51,7 @@ ifdef OPENFOAM_COM
+     # triSurface merged into surfMesh
+     TRISURFACE_INC=
+     THERMOPHYSICALFUNCTIONS_LIB=
+-  else ifeq "1705" "$(word 1, $(call num-sort,1705:$(OPENFOAM_COM)))"
++  else ifeq "1705" "$(word 1, $(sort 1705 $(OPENFOAM_COM)))"
+     # Changes with 1706
+     WMAKE_NEW_CONVENTION=new
+     FOAM_UNIFIEDTURBULENCE=yes
+@@ -59,7 +59,7 @@ ifdef OPENFOAM_COM
+     # triSurface merged into surfMesh
+     TRISURFACE_INC=
+     THERMOPHYSICALFUNCTIONS_LIB=
+-  else ifeq "1611" "$(word 1, $(call num-sort,1611:$(OPENFOAM_COM)))"
++  else ifeq "1611" "$(word 1, $(sort 1611 $(OPENFOAM_COM)))"
+     # Changes with 1612
+     WMAKE_NEW_CONVENTION=new
+     FOAM_UNIFIEDTURBULENCE=yes
+@@ -70,16 +70,16 @@ endif
  
--    if [ `uname -s`=="Darwin" ]; then
--	SOEXT=dylib
--    fi
-+#     if [ `uname -s`=="Darwin" ]; then
-+# 	SOEXT=dylib
-+#     fi
+ LAGRANGIAN_INTERMEDIATE_LIB=-llagrangianIntermediate
  
--    oldPython="$FOAM_USER_LIBBIN/libpythonIntegration.$SOEXT"
--    if [ -e $oldPython ]
--    then
--	echo "Removing old python integration $oldPython"
--	rm $oldPython
--    fi
--    wmake libso swakPythonIntegration
--else
--    echo
--    echo "SWAK_PYTHON2_INCLUDE not defined .... no Python2-Integration. Most people are fine without it"
--    echo
--fi
-+#     oldPython="$FOAM_USER_LIBBIN/libpythonIntegration.$SOEXT"
-+#     if [ -e $oldPython ]
-+#     then
-+# 	echo "Removing old python integration $oldPython"
-+# 	rm $oldPython
-+#     fi
-+#     wmake libso swakPythonIntegration
-+# else
-+#     echo
-+#     echo "SWAK_PYTHON2_INCLUDE not defined .... no Python2-Integration. Most people are fine without it"
-+#     echo
-+# fi
+-ifdef OPENFOAM_ORG
+-  $(info OpenFOAM.org version $(OPENFOAM_ORG))
+-  ifeq "8" "$(word 1, $(call num-sort,8:$(OPENFOAM_ORG)))"
+-    FOAM_TURBULENCE_IS_NOW_MOMENTUM_TRANSPORT=yes
+-  endif
+-  ifeq "9" "$(word 1, $(call num-sort,9:$(OPENFOAM_ORG)))"
+-    FOAM_UNSUPPORTED_CLOUD_IMPLEMENTATION=yes
+-    LAGRANGIAN_INTERMEDIATE_LIB=
+-  endif
+-endif
++# ifdef OPENFOAM_ORG
++#   $(info OpenFOAM.org version $(OPENFOAM_ORG))
++#   ifeq "8" "$(word 1, $(call num-sort,8:$(OPENFOAM_ORG)))"
++#     FOAM_TURBULENCE_IS_NOW_MOMENTUM_TRANSPORT=yes
++#   endif
++#   ifeq "9" "$(word 1, $(call num-sort,9:$(OPENFOAM_ORG)))"
++#     FOAM_UNSUPPORTED_CLOUD_IMPLEMENTATION=yes
++#     LAGRANGIAN_INTERMEDIATE_LIB=
++#   endif
++# endif
  
- if [ "$SWAK_PYTHON3_INCLUDE" != "" ]
- then
+ # -----------------------------------------------------------------------------
+ 
+@@ -89,7 +89,7 @@ ifeq "dev" "$(WM_PROJECT_VERSION)"
+   FOAM_UNIFIEDTURBULENCE=yes
+ endif
+ 
+-ifeq "3.0" "$(word 1, $(call num-sort,3.0:$(WM_PROJECT_VERSION_NUM)))"
++ifeq "3.0" "$(word 1, $(sort 3.0 $(WM_PROJECT_VERSION)))"
+   ifndef FOAM_DEV
+     WMAKE_NEW_CONVENTION=new
+     FOAM_UNIFIEDTURBULENCE=yes
+@@ -101,15 +101,15 @@ ifeq "3.0" "$(word 1, $(call num-sort,3.0:$(WM_PROJECT_VERSION_NUM)))"
+ endif
+ 
+ INCOMPRESSIBLE_TRANSPORT_LIB=-lincompressibleTransportModels
+-ifdef OPENFOAM_ORG
+-  ifeq "9" "$(word 1, $(call num-sort,9:$(OPENFOAM_ORG)))"
+-    ifeq "10" "$(word 1, $(call num-sort,10:$(OPENFOAM_ORG)))"
+-      INCOMPRESSIBLE_TRANSPORT_LIB=
+-    else
+-      INCOMPRESSIBLE_TRANSPORT_LIB=-ltransportModels
+-    endif
+-  endif
+-endif
++# ifdef OPENFOAM_ORG
++#   ifeq "9" "$(word 1, $(call num-sort,9:$(OPENFOAM_ORG)))"
++#     ifeq "10" "$(word 1, $(call num-sort,10:$(OPENFOAM_ORG)))"
++#       INCOMPRESSIBLE_TRANSPORT_LIB=
++#     else
++#       INCOMPRESSIBLE_TRANSPORT_LIB=-ltransportModels
++#     endif
++#   endif
++# endif
+ 
+ ifeq "$(FOAM_UNIFIEDTURBULENCE)" "yes"
+   COMPRESSIBLE_TRANSPORT_INC=-I$(LIB_SRC)/transportModels/compressible/lnInclude
+@@ -122,22 +122,22 @@ ifeq "$(FOAM_UNIFIEDTURBULENCE)" "yes"
+   COMPRESSIBLE_TURB_ALL_LIBS=
+   RADIATION_INC=-I$(LIB_SRC)/thermophysicalModels/radiation/lnInclude
+ 
+-  ifdef OPENFOAM_ORG
+-    ifeq "9" "$(word 1, $(call num-sort,9:$(OPENFOAM_ORG)))"
+-      COMPRESSIBLE_TRANSPORT_INC=-I$(LIB_SRC)/transportModels/lnInclude
+-    endif
+-  endif
++  # ifdef OPENFOAM_ORG
++  #   ifeq "9" "$(word 1, $(call num-sort,9:$(OPENFOAM_ORG)))"
++  #     COMPRESSIBLE_TRANSPORT_INC=-I$(LIB_SRC)/transportModels/lnInclude
++  #   endif
++  # endif
+ endif
+ 
+ ifeq "$(FOAM_TURBULENCE_IS_NOW_MOMENTUM_TRANSPORT)" "yes"
+   INCOMPRESSIBLE_TURB_LIB=-lmomentumTransportModels -lincompressibleMomentumTransportModels
+   COMPRESSIBLE_TURB_LIB=-lmomentumTransportModels -lfluidThermoMomentumTransportModels
+   COMPRESSIBLE_TRANSPORT_MODELS=-lthermophysicalTransportModels
+-  ifdef OPENFOAM_ORG
+-    ifeq "9" "$(word 1, $(call num-sort,9:$(OPENFOAM_ORG)))"
+-       COMPRESSIBLE_TURB_LIB=-lmomentumTransportModels -lcompressibleMomentumTransportModels
+-    endif
+-  endif
++  # ifdef OPENFOAM_ORG
++  #   ifeq "9" "$(word 1, $(call num-sort,9:$(OPENFOAM_ORG)))"
++  #      COMPRESSIBLE_TURB_LIB=-lmomentumTransportModels -lcompressibleMomentumTransportModels
++  #   endif
++  # endif
+ endif
+ 
+ ifdef FOAM_DEV
+@@ -147,38 +147,38 @@ ifdef FOAM_DEV
+   COMPRESSIBLE_TRANSPORT_MODELS=
+   FLUIDTHERMO_LIB=
+ else
+-  ifeq "2.2" "$(word 1, $(call num-sort,2.2:$(WM_PROJECT_VERSION_NUM)))"
++  ifeq "2.2" "$(word 1, $(sort 2.2 $(WM_PROJECT_VERSION)))"
+      FILEFORMATS_INC=-I$(LIB_SRC)/fileFormats/lnInclude
+      FLUIDTHERMO_LIB=-lfluidThermophysicalModels
+      SOLIDTHERMO_LIB=-lsolidThermo
+      FVOPTIONS_LIB=-lfvOptions
+      FVOPTIONS_INC=-I$(LIB_SRC)/fvOptions/lnInclude
+-     ifdef OPENFOAM_ORG
+-        ifeq "9" "$(word 1, $(call num-sort,9:$(OPENFOAM_ORG)))"
+-           FVOPTIONS_LIB=-lfvModels
+-           FVOPTIONS_INC=-I$(LIB_SRC)/fvModels/lnInclude
+-        endif
+-     endif
++    #  ifdef OPENFOAM_ORG
++    #     ifeq "9" "$(word 1, $(call num-sort,9:$(OPENFOAM_ORG)))"
++    #        FVOPTIONS_LIB=-lfvModels
++    #        FVOPTIONS_INC=-I$(LIB_SRC)/fvModels/lnInclude
++    #     endif
++    #  endif
+   endif
+ endif
+ 
+ DYNAMIC_FV_MESH_LIB=-ldynamicFvMesh -ltopoChangerFvMesh
+ 
+-ifdef OPENFOAM_ORG
+-  ifeq "10" "$(word 1, $(call num-sort,10:$(WM_PROJECT_VERSION_NUM)))"
+-    DYNAMIC_FV_MESH_LIB=
+-  endif
+-endif
++# ifdef OPENFOAM_ORG
++#   ifeq "10" "$(word 1, $(call num-sort,10:$(WM_PROJECT_VERSION_NUM)))"
++#     DYNAMIC_FV_MESH_LIB=
++#   endif
++# endif
+ 
+ ifndef FOAM_DEV
+   ifndef OPENFOAM_COM
+-    ifeq "4" "$(word 1, $(call num-sort,4:$(WM_PROJECT_VERSION_NUM)))"
++    ifeq "4" "$(word 1, $(sort 4 $(WM_PROJECT_VERSION)))"
+       NEEDS_FILTER_DROPIN=1
+     endif
+-    ifeq "4" "$(word 1, $(call num-sort,4:$(WM_PROJECT_VERSION_NUM)))"
++    ifeq "4" "$(word 1, $(sort 4 $(WM_PROJECT_VERSION)))"
+       THERMOPHYSICALFUNCTIONS_LIB=
+     endif
+-    ifeq "7" "$(word 1, $(call num-sort,7:$(WM_PROJECT_VERSION_NUM)))"
++    ifeq "7" "$(word 1, $(sort 7 $(WM_PROJECT_VERSION)))"
+       RADIATION_INC=-I$(LIB_SRC)/radiationModels/lnInclude
+     endif
+   endif
 diff --git a/Libraries/simpleFunctionObjects/functionObjectProxy/executeIfExecutableFitsFunctionObject/executeIfExecutableFitsFunctionObject.C b/Libraries/simpleFunctionObjects/functionObjectProxy/executeIfExecutableFitsFunctionObject/executeIfExecutableFitsFunctionObject.C
 index d5a42e1..f460960 100644
 --- a/Libraries/simpleFunctionObjects/functionObjectProxy/executeIfExecutableFitsFunctionObject/executeIfExecutableFitsFunctionObject.C
@@ -109,20 +238,20 @@ index d5a42e1..f460960 100644
          char path[1024];
          uint32_t size = sizeof(path);
 diff --git a/Utilities/Allwmake b/Utilities/Allwmake
-index c00d270..c2f9506 100755
+index b2c09ad..e12a223 100755
 --- a/Utilities/Allwmake
 +++ b/Utilities/Allwmake
-@@ -17,7 +17,7 @@ wmake calcNonUniformOffsetsForMapped
+@@ -19,7 +19,7 @@ wmake calcNonUniformOffsetsForMapped
  
  wmake fieldReport
  
 -wmake funkyPythonPostproc
-+# wmake funkyPythonPostproc
++#wmake funkyPythonPostproc
  
  if [[ "$OPENFOAM_ORG" != "" && $(( $OPENFOAM_ORG > 8 )) ]];
  then
 diff --git a/maintainanceScripts/makeCopyrightEntries.py b/maintainanceScripts/makeCopyrightEntries.py
-index 47d5500..c2331e6 100755
+index 0e31879..14abec0 100755
 --- a/maintainanceScripts/makeCopyrightEntries.py
 +++ b/maintainanceScripts/makeCopyrightEntries.py
 @@ -1,4 +1,4 @@
@@ -151,69 +280,24 @@ index 12f507b..4b35708 100755
  
  import sys
  from os import path
+diff --git a/swakConfiguration b/swakConfiguration
+new file mode 120000
+index 0000000..cdfbd1d
+--- /dev/null
++++ b/swakConfiguration
+@@ -0,0 +1 @@
++./swakConfiguration.automatic
+\ No newline at end of file
 diff --git a/swakConfiguration.automatic b/swakConfiguration.automatic
-index a3cecee..d2caaa2 100644
+index 6d9017d..e78cf29 100644
 --- a/swakConfiguration.automatic
 +++ b/swakConfiguration.automatic
-@@ -1,26 +1,26 @@
- # -*- shell-script -*-
+@@ -89,7 +89,7 @@ export SWAK_COMPILE_GRAMMAR_OPTION="-O1"
  
--if [[ -z "$SWAK_PYTHON2VERSION" ]] ; then
--    echo "Looking for Python 2"
--    for p2 in 7 6
--    do
--        WHICHPATH=$(which 2>/dev/null python2.$p2-config)
--        if [[ $? == 0 ]]; then
--            echo "Found Python 2.$p2"
--            SWAK_PYTHON2VERSION=$p2
--            break
--        fi
--    done
--else
--    echo "Python 2 preset to 2.$SWAK_PYTHON2VERSION"
--fi
-+# if [[ -z "$SWAK_PYTHON2VERSION" ]] ; then
-+#     echo "Looking for Python 2"
-+#     for p2 in 7 6
-+#     do
-+#         WHICHPATH=$(which 2>/dev/null python2.$p2-config)
-+#         if [[ $? == 0 ]]; then
-+#             echo "Found Python 2.$p2"
-+#             SWAK_PYTHON2VERSION=$p2
-+#             break
-+#         fi
-+#     done
-+# else
-+#     echo "Python 2 preset to 2.$SWAK_PYTHON2VERSION"
-+# fi
- 
--if [[ -n "$SWAK_PYTHON2VERSION" ]] ; then
--    echo "Configuring Python 2.$SWAK_PYTHON2VERSION"
--    export SWAK_PYTHON2_INCLUDE="$(python2.$SWAK_PYTHON2VERSION-config --cflags)"
--    export SWAK_PYTHON2_LINK="$(python2.$SWAK_PYTHON2VERSION-config --ldflags)"
--    echo "Using python2.$SWAK_PYTHON2VERSION at $WHICHPATH for python2"
--fi
-+# if [[ -n "$SWAK_PYTHON2VERSION" ]] ; then
-+#     echo "Configuring Python 2.$SWAK_PYTHON2VERSION"
-+#     export SWAK_PYTHON2_INCLUDE="$(python2.$SWAK_PYTHON2VERSION-config --cflags)"
-+#     export SWAK_PYTHON2_LINK="$(python2.$SWAK_PYTHON2VERSION-config --ldflags)"
-+#     echo "Using python2.$SWAK_PYTHON2VERSION at $WHICHPATH for python2"
-+# fi
- 
- if [[ -z "$SWAK_PYTHON3VERSION" ]] ; then
-     echo "Looking for Python 3"
-@@ -76,10 +76,10 @@ fi
- 
- export SWAK_COMPILE_GRAMMAR_OPTION="-O1"
- 
--if [ "$WM_USE_HOMEBREW" = 1 ]
--then
+ if [ "$WM_USE_HOMEBREW" = 1 ]
+ then
 -    export SWAK_BISON=/usr/local/opt/bison27/bin/bison
--fi
-+# if [ "$WM_USE_HOMEBREW" = 1 ]
-+# then
-+    export SWAK_BISON=/opt/homebrew/opt/bison/bin/bison
-+# fi
++    export SWAK_BISON=$(brew --prefix bison)/bin/bison
+ fi
  
  # If enabled, uses a 30 delay for building Bison generated files.
- # Useful only for checking if there are any race conditions.
