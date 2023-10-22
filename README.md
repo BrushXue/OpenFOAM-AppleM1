@@ -71,5 +71,36 @@ runParallel ***Foam
 ```
 to avoid macOS restrictions.
 
+## swak4Foam
+### Procedures
+1. Download swak4Foam
+```
+hg clone http://hg.code.sf.net/p/openfoam-extend/swak4Foam swak4Foam
+cd swak4Foam
+hg update develop
+```
+2. Apply my patch for macOS.
+```
+curl -OL https://github.com/BrushXue/OpenFOAM-AppleM1/raw/main/swak4Foam.patch
+git apply swak4Foam.patch
+```
+3. Install these components from homebrew:
+```
+brew install bison pkgconfig
+```
+4. Add bison to the path:
+```
+export PATH="$(brew --prefix)/opt/bison/bin:$PATH"
+```
+5. Compile the code.
+```
+export WM_NCOMPPROCS=$(sysctl -n hw.ncpu)
+./AllwmakeAll
+```
+It takes approximately 6 minutes on M1.
+
+### Known issue
+python 2.7 is removed in macOS 12.3+. Therefore `funkyPythonPostproc` is disabled.
+
 ## Benchmark
 The [benchmark](https://github.com/BrushXue/OpenFOAM-AppleM1/raw/main/bench_template.zip) is modified from https://www.cfd-online.com/Forums/hardware/198378-openfoam-benchmarks-various-hardware.html
