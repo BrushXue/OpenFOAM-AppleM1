@@ -4,29 +4,30 @@ Patch to compile OpenFOAM-v2306 on M1 Mac.
 
 ## OpenFOAM-v2306
 ### Procedures
-1. Create to a **case-sensitive volume** like this
 
-![](https://develop.openfoam.com/Development/openfoam/-/wikis/images/apple-APFS-screenshot.png)
-
-I usually create a soft link so I don't need to change `etc/bashrc`
-```
-ln -s /Volumes/OpenFOAM ~/OpenFOAM
-cd ~/OpenFOAM
-```
-
-2. Install these components from homebrew
+1. Install these dependencies from homebrew
 ```
 brew install cmake open-mpi libomp adios2 boost cgal fftw kahip metis petsc hypre
 ```
 
-3. Install legacy `Scotch` (Thanks to @gerlero for creating this [tap](https://github.com/gerlero/homebrew-openfoam/tree/main/Formula))
+2. Install legacy `Scotch` (Thanks to @gerlero for creating this [tap](https://github.com/gerlero/homebrew-openfoam/tree/main/Formula))
 ```
 brew tap gerlero/openfoam
 brew install scotch-no-pthread
 ```
 
+3. Create a **case-sensitive APFS volume** like this
+
+![](https://develop.openfoam.com/Development/openfoam/-/wikis/images/apple-APFS-screenshot.png)
+
+I usually create a soft link to keep everything consistent with Linux.
+```
+ln -s /Volumes/OpenFOAM ~/OpenFOAM
+```
+
 4. Clone the OpenFOAM source code into this volume
 ```
+cd ~/OpenFOAM
 git clone https://develop.openfoam.com/Development/openfoam.git OpenFOAM-v2306
 cd OpenFOAM-v2306
 git checkout OpenFOAM-v2306
@@ -40,21 +41,25 @@ curl -OL https://github.com/BrushXue/OpenFOAM-AppleM1/raw/main/M1.patch
 git apply M1.patch
 ```
 
-6. Add OpenFOAM to `.zshrc` or `.bashrc`
+6. Add OpenFOAM to `.zshrc` or `.bashrc`(if you wish)
 ```
 echo 'source ~/OpenFOAM/OpenFOAM-v2306/etc/bashrc' >> ~/.zshrc
 ```
-And you need to add the following for M1 (not for x86):
+**Important:** you need to add the following for M1 (but not for x86):
 ```
 export CPATH=/opt/homebrew/include
 export LIBRARY_PATH=/opt/homebrew/lib
 ```
 
-7. Compile the code with [bear](https://openfoamwiki.net/index.php/HowTo_Use_OpenFOAM_with_Visual_Studio_Code) (remove `-with-bear` if you don't need it).
+7. Compile the 
 ```
-./Allwmake -j -s -l -with-bear
+./Allwmake -j -s -l
 ```
 It takes 40~45 minutes on M1.
+
+You may add `-with-bear` option after installing `bear`.
+
+See https://openfoamwiki.net/index.php/HowTo_Use_OpenFOAM_with_Visual_Studio_Code for more information
 
 8. (Optional)Install `paraview` from Homebrew
 ```
