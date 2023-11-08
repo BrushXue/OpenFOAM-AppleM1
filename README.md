@@ -31,6 +31,9 @@ cd ~/OpenFOAM
 git clone https://develop.openfoam.com/Development/openfoam.git OpenFOAM-v2306
 cd OpenFOAM-v2306
 git checkout OpenFOAM-v2306
+```
+**Optional:** adding submodules such as petsc4Foam
+```
 git submodule init
 git submodule update
 ```
@@ -51,17 +54,17 @@ export CPATH=/opt/homebrew/include
 export LIBRARY_PATH=/opt/homebrew/lib
 ```
 
-7. Compile the 
+7. Compile the code
 ```
 ./Allwmake -j -s -l
 ```
 It takes 40~45 minutes on M1.
 
-You may add `-with-bear` option after installing `bear`.
+**Optional:** you may add `-with-bear` option after installing `bear`.
 
 See https://openfoamwiki.net/index.php/HowTo_Use_OpenFOAM_with_Visual_Studio_Code for more information
 
-8. (Optional)Install `paraview` from Homebrew
+**Optional:** Install `paraview` from Homebrew
 ```
 brew install --cask paraview
 ```
@@ -69,31 +72,30 @@ brew install --cask paraview
 ### Known issue
 Currently on Apple Silicon, floating point exception will trap SIGILL instead of SIGFPE. It is known that Asahi Linux can correctly trap SIGFPE so the problem is from macOS or XCode. The workaround is to use SIGILL for now. If you don't like this workaround, please submit a bug report to Apple (but don't expect they'll fix it).
 
-It is suggested to run parallel command in scripts by using
+It is suggested to run the following parallel command in scripts to avoid macOS restrictions.
 ```
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 runParallel ***Foam
 ```
-to avoid macOS restrictions.
 
 ## swak4Foam
 ### Procedures
-1. Download swak4Foam
+1. Install these dependencies from homebrew:
+```
+brew install mercurial bison pkgconfig
+```
+2. Download swak4Foam
 ```
 hg clone http://hg.code.sf.net/p/openfoam-extend/swak4Foam swak4Foam
 cd swak4Foam
 hg update develop
 ```
-2. Apply my patch for macOS.
+3. Apply my patch for macOS.
 ```
 curl -OL https://github.com/BrushXue/OpenFOAM-AppleM1/raw/main/swak4Foam.patch
 git apply swak4Foam.patch
 ```
-3. Install these components from homebrew:
-```
-brew install bison pkgconfig
-```
-4. Add bison to the path:
+4. **Important:** add bison to PATH:
 ```
 export PATH="$(brew --prefix)/opt/bison/bin:$PATH"
 ```
