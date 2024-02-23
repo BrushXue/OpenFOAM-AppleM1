@@ -137,7 +137,7 @@ index bb7261a059..4063f4c77a 100644
 -SCOTCH_VERSION=scotch_6.1.0
 -export SCOTCH_ARCH_PATH=$WM_THIRD_PARTY_DIR/platforms/$WM_ARCH$WM_COMPILER$WM_PRECISION_OPTION$WM_LABEL_OPTION/$SCOTCH_VERSION
 +SCOTCH_VERSION=scotch-system
-+export SCOTCH_ARCH_PATH=$(brew --prefix scotch-no-pthread)
++export SCOTCH_ARCH_PATH=$(brew --prefix scotch)
  
  # END OF (NORMAL) USER EDITABLE PART
  #------------------------------------------------------------------------------
