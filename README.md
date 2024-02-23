@@ -7,16 +7,10 @@ Patch to compile OpenFOAM-v2306 on M1 Mac.
 
 1. Install these dependencies from homebrew
 ```
-brew install cmake open-mpi libomp adios2 boost cgal fftw kahip metis petsc hypre
+brew install cmake open-mpi libomp adios2 boost cgal fftw kahip metis petsc scotch hypre
 ```
 
-2. Install legacy `Scotch` (Thanks to @gerlero for creating this [tap](https://github.com/gerlero/homebrew-openfoam/tree/main/Formula))
-```
-brew tap gerlero/openfoam
-brew install scotch-no-pthread
-```
-
-3. Create a **case-sensitive APFS volume** like this
+2. Create a **case-sensitive APFS volume** like this
 
 ![](https://develop.openfoam.com/Development/openfoam/-/wikis/images/apple-APFS-screenshot.png)
 
@@ -25,7 +19,7 @@ I usually create a soft link to keep everything consistent with Linux.
 ln -s /Volumes/OpenFOAM ~/OpenFOAM
 ```
 
-4. Clone the OpenFOAM source code into this volume
+3. Clone the OpenFOAM source code into this volume
 ```
 cd ~/OpenFOAM
 git clone https://develop.openfoam.com/Development/openfoam.git OpenFOAM-v2306
@@ -38,13 +32,13 @@ git submodule init
 git submodule update
 ```
 
-5. Apply my patch for M1.
+4. Apply my patch for M1.
 ```
 curl -OL https://github.com/BrushXue/OpenFOAM-AppleM1/raw/main/M1.patch
 git apply M1.patch
 ```
 
-6. Add OpenFOAM to `.zshrc` or `.bashrc`(if you wish)
+5. Add OpenFOAM to `.zshrc` or `.bashrc`(if you wish)
 ```
 echo 'source ~/OpenFOAM/OpenFOAM-v2306/etc/bashrc' >> ~/.zshrc
 ```
@@ -54,7 +48,7 @@ export CPATH=/opt/homebrew/include
 export LIBRARY_PATH=/opt/homebrew/lib
 ```
 
-7. Compile the code
+6. Compile the code
 ```
 ./Allwmake -j -s -l
 ```
