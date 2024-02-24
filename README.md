@@ -2,7 +2,6 @@
 
 Patch to compile OpenFOAM-v2312 on Apple Silicon.
 
-## OpenFOAM-v2306
 ### Procedures
 
 1. Install these dependencies from homebrew
