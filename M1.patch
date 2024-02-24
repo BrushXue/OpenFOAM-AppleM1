@@ -1,5 +1,5 @@
 diff --git a/etc/config.sh/CGAL b/etc/config.sh/CGAL
-index 68f679de00..8d7173d9fc 100644
+index 68f679de00..1bf1e889de 100644
 --- a/etc/config.sh/CGAL
 +++ b/etc/config.sh/CGAL
 @@ -43,14 +43,14 @@
@@ -39,14 +39,14 @@ index 6d26f9d970..d63f0feacb 100644
  # END OF (NORMAL) USER EDITABLE PART
  #------------------------------------------------------------------------------
 diff --git a/etc/config.sh/adios2 b/etc/config.sh/adios2
-index 4fe9d6183d..8e4897b89a 100644
+index ae967dc7c8..1eac6d4caa 100644
 --- a/etc/config.sh/adios2
 +++ b/etc/config.sh/adios2
 @@ -21,8 +21,8 @@
  #------------------------------------------------------------------------------
  # USER EDITABLE PART: Changes made here may be lost with the next upgrade
  
--adios2_version=ADIOS2-2.8.3
+-adios2_version=ADIOS2-2.9.2
 -export ADIOS2_ARCH_PATH="$WM_THIRD_PARTY_DIR/platforms/$WM_ARCH$WM_COMPILER/$adios2_version"
 +adios2_version=ADIOS2-system
 +export ADIOS2_ARCH_PATH=$(brew --prefix adios2)
@@ -127,7 +127,7 @@ index c512ebb376..41e441c3ab 100644
  # END OF (NORMAL) USER EDITABLE PART
  #------------------------------------------------------------------------------
 diff --git a/etc/config.sh/scotch b/etc/config.sh/scotch
-index bb7261a059..4063f4c77a 100644
+index bb7261a059..6dd6202f41 100644
 --- a/etc/config.sh/scotch
 +++ b/etc/config.sh/scotch
 @@ -35,8 +35,8 @@
@@ -153,165 +153,60 @@ index 7735c4cf41..3eb37fdd02 100644
      # Defult to clang (not gcc) as system compiler
      if [ "$WM_COMPILER" = Gcc ]
      then
-diff --git a/src/OSspecific/POSIX/signals/feexceptErsatz.H b/src/OSspecific/POSIX/signals/feexceptErsatz.H
-index e48b627758..d1f25226cf 100644
---- a/src/OSspecific/POSIX/signals/feexceptErsatz.H
-+++ b/src/OSspecific/POSIX/signals/feexceptErsatz.H
-@@ -38,20 +38,20 @@ inline int feenableexcept(unsigned int excepts)
-         return -1;
-     }
+diff --git a/etc/config.sh/setup b/etc/config.sh/setup
+index 837eb90de4..bf9c7c22e3 100644
+--- a/etc/config.sh/setup
++++ b/etc/config.sh/setup
+@@ -230,7 +230,8 @@ then
+ fi
  
--#if defined __arm64__
--    old_excepts = fenv.__fpcr & FE_ALL_EXCEPT;
--#else
-+    #if defined __arm64__
-+    old_excepts = fenv.__fpsr & FE_ALL_EXCEPT;
-+    #else
-     old_excepts = fenv.__control & FE_ALL_EXCEPT;
--#endif
-+    #endif
+ # OpenFOAM user, group libraries
+-_foamAddLib  "$FOAM_USER_LIBBIN:$FOAM_SITE_LIBBIN"
++_foamAddLib  "$FOAM_SITE_LIBBIN"
++_foamAddLib  "$FOAM_USER_LIBBIN"
  
-     // unmask
--#if defined __arm64__
--    fenv.__fpcr &= ~new_excepts;
--    fenv.__fpsr &= ~(new_excepts << 7);
--#else
-+    #if defined __arm64__
-+    fenv.__fpsr |= new_excepts;
-+    fenv.__fpcr |= new_excepts << 8;
-+    #else
-     fenv.__control &= ~new_excepts;
-     fenv.__mxcsr   &= ~(new_excepts << 7);
--#endif
-+    #endif
+ if [ -d "$WM_PROJECT_DIR/doc/man1" ]
+ then
+diff --git a/src/OpenFOAM/db/IOstreams/memory/memoryStreamBuffer.H b/src/OpenFOAM/db/IOstreams/memory/memoryStreamBuffer.H
+index 8de6992f87..ea9ef6abe0 100644
+--- a/src/OpenFOAM/db/IOstreams/memory/memoryStreamBuffer.H
++++ b/src/OpenFOAM/db/IOstreams/memory/memoryStreamBuffer.H
+@@ -519,7 +519,8 @@ public:
+                 if (newCapacity < len)
+                 {
+                     // Increase capacity (doubling)
+-                    newCapacity = max(len, label(2*storage_.size()));
++                    newCapacity =
++                        Foam::max(label(len), label(2*storage_.size()));
+                 }
  
-     return fesetenv(&fenv) ? -1 : old_excepts;
- }
-@@ -68,20 +68,20 @@ inline int fedisableexcept(unsigned int excepts)
-         return -1;
-     }
- 
--#if defined __arm64__
--    old_excepts = fenv.__fpcr & FE_ALL_EXCEPT;
--#else
-+    #if defined __arm64__
-+    old_excepts = fenv.__fpsr & FE_ALL_EXCEPT;
-+    #else
-     old_excepts = fenv.__control & FE_ALL_EXCEPT;
--#endif
-+    #endif
- 
-     // mask
--#if defined __arm64__
--    fenv.__fpcr |= new_excepts;
--    fenv.__fpsr |= new_excepts << 7;
--#else
-+    #if defined __arm64__
-+    fenv.__fpsr &= ~new_excepts;
-+    fenv.__fpcr &= ~(new_excepts << 8);
-+    #else
-     fenv.__control |= new_excepts;
-     fenv.__mxcsr   |= new_excepts << 7;
--#endif
-+    #endif
- 
-     return fesetenv(&fenv) ? -1 : old_excepts;
- }
-diff --git a/src/OSspecific/POSIX/signals/sigFpe.C b/src/OSspecific/POSIX/signals/sigFpe.C
-index c02588e19b..2824f63bcc 100644
---- a/src/OSspecific/POSIX/signals/sigFpe.C
-+++ b/src/OSspecific/POSIX/signals/sigFpe.C
-@@ -118,9 +118,12 @@ void* Foam::sigFpe::mallocNan(size_t size)
- void Foam::sigFpe::sigHandler(int)
- {
-     #if (defined(__linux__) && defined(__GNUC__)) || defined(__APPLE__)
--
-+    // Workaround for Apple Silicon
-+    #if defined(__APPLE__) && defined(__arm64__)
-+    resetHandler("SIGFPE", SIGILL);
-+    #else
-     resetHandler("SIGFPE", SIGFPE);
--
-+    #endif
-     JobInfo::shutdown();        // From running -> finished
-     error::printStack(Perr);
-     ::raise(SIGFPE);            // Throw signal (to old handler)
-@@ -192,8 +195,12 @@ void Foam::sigFpe::set(bool verbose)
-           | FE_INVALID
-           | FE_OVERFLOW
-         );
--
-+        // Workaround for Apple Silicon
-+        #if defined(__APPLE__) && defined(__arm64__)
-+        setHandler("SIGFPE", SIGILL, sigHandler);
-+        #else
-         setHandler("SIGFPE", SIGFPE, sigHandler);
-+        #endif
- 
-         sigActive_ = true;
-         #endif
-@@ -248,8 +255,12 @@ void Foam::sigFpe::unset(bool verbose)
-             Info<< "sigFpe : Disabling floating point exception trapping"
-                 << endl;
-         }
--
-+        // Workaround for Apple Silicon
-+        #if defined(__APPLE__) && defined(__arm64__)
-+        resetHandler("SIGFPE", SIGILL);
-+        #else
-         resetHandler("SIGFPE", SIGFPE);
-+        #endif
- 
-         // Reset exception raising
-         const int oldExcept = fedisableexcept
+                 // Info<<"request:" << len
 diff --git a/wmake/rules/darwin64Clang/c b/wmake/rules/darwin64Clang/c
-index d145bd5b92..9e40bdef57 100644
+index 3083b281ed..4648a0dcd3 100644
 --- a/wmake/rules/darwin64Clang/c
 +++ b/wmake/rules/darwin64Clang/c
-@@ -1,7 +1,7 @@
- #------------------------------------------------------------------------------
- include $(GENERAL_RULES)/Clang/c
+@@ -5,7 +5,7 @@ ifneq (,$(findstring +xcrun,$(WM_COMPILE_CONTROL)))
+ cc         := xcrun cc
+ endif
  
 -cARCH      := -m64 -ftrapping-math
-+cARCH      := -ftrapping-math -ffp-contract=off
++cARCH      := -m64 -ftrapping-math -ffp-contract=off
  
  ifneq (,$(strip $(WM_COMPILE_OPTION)))
      sinclude $(DEFAULT_RULES)/c$(WM_COMPILE_OPTION)
-@@ -15,8 +15,8 @@ ctoo        = $(WM_SCHEDULER) $(cc) $(cFLAGS) -c $< -o $@
- 
- LINK_LIBS   = $(cDBUG)
- 
--LINKLIBSO   = $(cc) $(cARCH) -Wl,-dylib,-undefined,dynamic_lookup
-+LINKLIBSO   = $(cc) $(cARCH) -Wl,-undefined,dynamic_lookup,-no_fixup_chains,-dylib
- 
--LINKEXE     = $(cc) $(cARCH) -Wl,-execute,-undefined,dynamic_lookup
-+LINKEXE     = $(cc) $(cARCH) -Wl,-undefined,dynamic_lookup,-no_fixup_chains,-execute
- 
- #------------------------------------------------------------------------------
 diff --git a/wmake/rules/darwin64Clang/c++ b/wmake/rules/darwin64Clang/c++
-index 7547b28d53..0ca8df4660 100644
+index 01158bcb0f..099d1fda12 100644
 --- a/wmake/rules/darwin64Clang/c++
 +++ b/wmake/rules/darwin64Clang/c++
-@@ -1,7 +1,7 @@
- #------------------------------------------------------------------------------
- include $(GENERAL_RULES)/Clang/c++
+@@ -5,7 +5,7 @@ ifneq (,$(findstring +xcrun,$(WM_COMPILE_CONTROL)))
+ CC         := xcrun c++ -std=c++14
+ endif
  
 -c++ARCH    := -m64 -pthread -ftrapping-math
-+c++ARCH    := -pthread -ftrapping-math -ffp-contract=off
++c++ARCH    := -m64 -pthread -ftrapping-math -ffp-contract=off
  
  ifneq (,$(strip $(WM_COMPILE_OPTION)))
      sinclude $(DEFAULT_RULES)/c++$(WM_COMPILE_OPTION)
-@@ -18,8 +18,8 @@ cxxtoo      = $(Ctoo)
- 
- LINK_LIBS   = $(c++DBUG)
- 
--LINKLIBSO   = $(CC) $(c++FLAGS) -Wl,-dylib,-undefined,dynamic_lookup
-+LINKLIBSO   = $(CC) $(c++FLAGS) -Wl,-undefined,dynamic_lookup,-no_fixup_chains,-dylib
- 
--LINKEXE     = $(CC) $(c++FLAGS) -Wl,-execute,-undefined,dynamic_lookup
-+LINKEXE     = $(CC) $(c++FLAGS) -Wl,-undefined,dynamic_lookup,-no_fixup_chains,-execute
- 
- #------------------------------------------------------------------------------
 diff --git a/wmake/rules/darwin64Clang/general b/wmake/rules/darwin64Clang/general
 index 4a5acb5ef9..c5c0156d86 100644
 --- a/wmake/rules/darwin64Clang/general
