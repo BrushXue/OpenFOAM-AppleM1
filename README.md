@@ -1,6 +1,6 @@
 # OpenFOAM-AppleM1
 
-Patch to compile OpenFOAM-v2306 on M1 Mac.
+Patch to compile OpenFOAM-v2312 on Apple Silicon.
 
 ## OpenFOAM-v2306
 ### Procedures
@@ -22,9 +22,9 @@ ln -s /Volumes/OpenFOAM ~/OpenFOAM
 3. Clone the OpenFOAM source code into this volume
 ```
 cd ~/OpenFOAM
-git clone https://develop.openfoam.com/Development/openfoam.git OpenFOAM-v2306
-cd OpenFOAM-v2306
-git checkout OpenFOAM-v2306
+git clone https://develop.openfoam.com/Development/openfoam.git OpenFOAM-v2312
+cd OpenFOAM-v2312
+git checkout OpenFOAM-v2312
 ```
 **Optional:** adding submodules such as petsc4Foam
 ```
@@ -40,7 +40,7 @@ git apply M1.patch
 
 5. Add OpenFOAM to `.zshrc` or `.bashrc`(if you wish)
 ```
-echo 'source ~/OpenFOAM/OpenFOAM-v2306/etc/bashrc' >> ~/.zshrc
+echo 'source ~/OpenFOAM/OpenFOAM-v2312/etc/bashrc' >> ~/.zshrc
 ```
 **Important:** you need to add the following for M1 (but not for x86):
 ```
@@ -65,43 +65,3 @@ brew install --cask paraview
 
 ### Known issue
 Currently on Apple Silicon, floating point exception will trap SIGILL instead of SIGFPE. It is known that Asahi Linux can correctly trap SIGFPE so the problem is from macOS or XCode. The workaround is to use SIGILL for now. If you don't like this workaround, please submit a bug report to Apple (but don't expect they'll fix it).
-
-It is suggested to run the following parallel command in scripts to avoid macOS restrictions.
-```
-. $WM_PROJECT_DIR/bin/tools/RunFunctions
-runParallel ***Foam
-```
-
-## swak4Foam
-### Procedures
-1. Install these dependencies from homebrew:
-```
-brew install mercurial bison pkgconfig
-```
-2. Download swak4Foam
-```
-hg clone http://hg.code.sf.net/p/openfoam-extend/swak4Foam swak4Foam
-cd swak4Foam
-hg update develop
-```
-3. Apply my patch for macOS.
-```
-curl -OL https://github.com/BrushXue/OpenFOAM-AppleM1/raw/main/swak4Foam.patch
-git apply swak4Foam.patch
-```
-4. **Important:** add bison to PATH:
-```
-export PATH="$(brew --prefix)/opt/bison/bin:$PATH"
-```
-5. Compile the code.
-```
-export WM_NCOMPPROCS=$(sysctl -n hw.ncpu)
-./AllwmakeAll
-```
-It takes approximately 6 minutes on M1.
-
-### Known issue
-python 2.7 is removed in macOS 12.3+. Therefore `funkyPythonPostproc` is disabled.
-
-## Benchmark
-The [benchmark](https://github.com/BrushXue/OpenFOAM-AppleM1/raw/main/bench_template.zip) is modified from https://www.cfd-online.com/Forums/hardware/198378-openfoam-benchmarks-various-hardware.html
