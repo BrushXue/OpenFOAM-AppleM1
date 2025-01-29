@@ -39,14 +39,14 @@ index 6d26f9d970..d63f0feacb 100644
  # END OF (NORMAL) USER EDITABLE PART
  #------------------------------------------------------------------------------
 diff --git a/etc/config.sh/adios2 b/etc/config.sh/adios2
-index ae967dc7c8..1eac6d4caa 100644
+index 7243944759..cdd7e86e8c 100644
 --- a/etc/config.sh/adios2
 +++ b/etc/config.sh/adios2
 @@ -21,8 +21,8 @@
  #------------------------------------------------------------------------------
  # USER EDITABLE PART: Changes made here may be lost with the next upgrade
  
--adios2_version=ADIOS2-2.9.2
+-adios2_version=ADIOS2-2.10.1
 -export ADIOS2_ARCH_PATH="$WM_THIRD_PARTY_DIR/platforms/$WM_ARCH$WM_COMPILER/$adios2_version"
 +adios2_version=ADIOS2-system
 +export ADIOS2_ARCH_PATH=$(brew --prefix adios2)
@@ -67,14 +67,14 @@ index 617ee6dfc9..cac869fb9f 100644
  # END OF (NORMAL) USER EDITABLE PART
  #------------------------------------------------------------------------------
 diff --git a/etc/config.sh/hypre b/etc/config.sh/hypre
-index 6f2648f2a3..d07bfdf0be 100644
+index ba2564c03c..6f578930f5 100644
 --- a/etc/config.sh/hypre
 +++ b/etc/config.sh/hypre
 @@ -27,8 +27,8 @@
  #------------------------------------------------------------------------------
  # USER EDITABLE PART: Changes made here may be lost with the next upgrade
  
--hypre_version=hypre-2.23.0
+-hypre_version=hypre-2.31.0
 -export HYPRE_ARCH_PATH="$WM_THIRD_PARTY_DIR/platforms/$WM_ARCH$WM_COMPILER$WM_PRECISION_OPTION$WM_LABEL_OPTION/$hypre_version"
 +hypre_version=hypre-system
 +export HYPRE_ARCH_PATH=$(brew --prefix hypre)
@@ -112,14 +112,14 @@ index 6242dda174..32af9cb7b6 100644
  # END OF (NORMAL) USER EDITABLE PART
  #------------------------------------------------------------------------------
 diff --git a/etc/config.sh/petsc b/etc/config.sh/petsc
-index c512ebb376..41e441c3ab 100644
+index 93054546c6..09b2785855 100644
 --- a/etc/config.sh/petsc
 +++ b/etc/config.sh/petsc
 @@ -27,8 +27,8 @@
  #------------------------------------------------------------------------------
  # USER EDITABLE PART: Changes made here may be lost with the next upgrade
  
--petsc_version=petsc-3.19.2
+-petsc_version=petsc-3.21.2
 -export PETSC_ARCH_PATH="$WM_THIRD_PARTY_DIR/platforms/$WM_ARCH$WM_COMPILER$WM_PRECISION_OPTION$WM_LABEL_OPTION/$petsc_version"
 +petsc_version=petsc-system
 +export PETSC_ARCH_PATH=$(brew --prefix petsc)
@@ -153,34 +153,6 @@ index 7735c4cf41..3eb37fdd02 100644
      # Defult to clang (not gcc) as system compiler
      if [ "$WM_COMPILER" = Gcc ]
      then
-diff --git a/etc/config.sh/setup b/etc/config.sh/setup
-index 837eb90de4..bf9c7c22e3 100644
---- a/etc/config.sh/setup
-+++ b/etc/config.sh/setup
-@@ -230,7 +230,8 @@ then
- fi
- 
- # OpenFOAM user, group libraries
--_foamAddLib  "$FOAM_USER_LIBBIN:$FOAM_SITE_LIBBIN"
-+_foamAddLib  "$FOAM_SITE_LIBBIN"
-+_foamAddLib  "$FOAM_USER_LIBBIN"
- 
- if [ -d "$WM_PROJECT_DIR/doc/man1" ]
- then
-diff --git a/src/OpenFOAM/db/IOstreams/memory/memoryStreamBuffer.H b/src/OpenFOAM/db/IOstreams/memory/memoryStreamBuffer.H
-index 8de6992f87..ea9ef6abe0 100644
---- a/src/OpenFOAM/db/IOstreams/memory/memoryStreamBuffer.H
-+++ b/src/OpenFOAM/db/IOstreams/memory/memoryStreamBuffer.H
-@@ -519,7 +519,8 @@ public:
-                 if (newCapacity < len)
-                 {
-                     // Increase capacity (doubling)
--                    newCapacity = max(len, label(2*storage_.size()));
-+                    newCapacity =
-+                        Foam::max(label(len), label(2*storage_.size()));
-                 }
- 
-                 // Info<<"request:" << len
 diff --git a/wmake/rules/darwin64Clang/c b/wmake/rules/darwin64Clang/c
 index 3083b281ed..4648a0dcd3 100644
 --- a/wmake/rules/darwin64Clang/c
@@ -195,11 +167,11 @@ index 3083b281ed..4648a0dcd3 100644
  ifneq (,$(strip $(WM_COMPILE_OPTION)))
      sinclude $(DEFAULT_RULES)/c$(WM_COMPILE_OPTION)
 diff --git a/wmake/rules/darwin64Clang/c++ b/wmake/rules/darwin64Clang/c++
-index 01158bcb0f..099d1fda12 100644
+index 7793657344..7d6b23d0fe 100644
 --- a/wmake/rules/darwin64Clang/c++
 +++ b/wmake/rules/darwin64Clang/c++
 @@ -5,7 +5,7 @@ ifneq (,$(findstring +xcrun,$(WM_COMPILE_CONTROL)))
- CC         := xcrun c++ -std=c++14
+ CC         := xcrun c++ -std=c++17
  endif
  
 -c++ARCH    := -m64 -pthread -ftrapping-math

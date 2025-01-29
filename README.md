@@ -1,6 +1,6 @@
 # OpenFOAM-AppleM1
 
-Patch to compile OpenFOAM-v2312 on Apple Silicon.
+Patch to compile OpenFOAM-v2412 on Apple Silicon.
 
 ### Procedures
 
@@ -21,9 +21,9 @@ ln -s /Volumes/OpenFOAM ~/OpenFOAM
 3. Clone the OpenFOAM source code into this volume
 ```
 cd ~/OpenFOAM
-git clone https://develop.openfoam.com/Development/openfoam.git OpenFOAM-v2312
-cd OpenFOAM-v2312
-git checkout OpenFOAM-v2312
+git clone https://develop.openfoam.com/Development/openfoam.git OpenFOAM-v2412
+cd OpenFOAM-v2412
+git checkout OpenFOAM-v2412
 ```
 **Optional:** adding submodules such as petsc4Foam
 ```
@@ -39,7 +39,7 @@ git apply M1.patch
 
 5. Add OpenFOAM to `.zshrc` or `.bashrc`(if you wish)
 ```
-echo 'source ~/OpenFOAM/OpenFOAM-v2312/etc/bashrc' >> ~/.zshrc
+echo 'source ~/OpenFOAM/OpenFOAM-v2412/etc/bashrc' >> ~/.zshrc
 ```
 **Important:** you need to add the following for M1 (but not for x86):
 ```
